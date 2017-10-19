@@ -1,3 +1,5 @@
+import copy
+
 
 class Domain:
     def __init__(self, d):
@@ -48,7 +50,18 @@ class Table:
         self.uuid = d['uuid']
 
     def get_attributes(self):
-        return {k: v for k, v in self.__dict__.items() if v is not None}
+        dict_order = {'name': None,
+                      'description': None,
+                      'props': None}
+        dict_order.update({k: v for k, v in self.__dict__.items()
+                           if v is not None and v is not True})
+        s = ""
+        for k, v in self.__dict__.items():
+            if v == True:
+                s += k[4:] + ', '
+        if not s == "":
+            dict_order['props'] = s[:-2]
+        return {k: v for k, v in dict_order.items() if v is not None}
 
 
 class Field:
@@ -70,7 +83,27 @@ class Field:
         self.uuid = d['uuid']
 
     def get_attributes(self):
-        return {k: v for k, v in self.__dict__.items() if v is not None}
+        s = ""
+        for k, v in self.__dict__.items():
+            if v == True:
+                if k[:4] == "can_":
+                    s += k[4:] + ', '
+                else:
+                    s += k + ', '
+        new_dic = {}
+        if not s == "":
+            new_dic['props'] = s[:-2]
+        new_dic.update({k: v for k, v in self.__dict__.items()
+                        if v is not None and v is not True})
+        new_dic['rname'] = new_dic.pop('russian_short_name')
+        dict_order = {'name': None,
+                      'rname': None,
+                      'domain': "",
+                      'description': None,
+                      'props': None}
+        dict_order.update(new_dic)
+        return {k: v for k, v in dict_order.items() if v is not None}
+
 
 class Setting:
     def __init__(self, key=None, value=None, valueb=None):
@@ -85,6 +118,7 @@ class Constraint:
         self.table_id = d['table_id']
         self.name = d['name']
         self.constraint_type = d['constraint_type']
+        self.reference = d['reference']
         self.unique_key_id = d['unique_key_id']
         self.has_value_edit = d['has_value_edit']
         self.cascading_delete = d['cascading_delete']
@@ -92,15 +126,30 @@ class Constraint:
         self.uuid = d['uuid']
 
     def get_attributes(self):
-        return {k: v for k, v in self.__dict__.items() if v is not None and not k == "table_id"}
+        s = ""
+        for k, v in self.__dict__.items():
+            if v == True:
+                s += k + ', '
+        new_dic = {}
+        if not s == "":
+            new_dic['props'] = s[:-2]
+        new_dic.update({k: v for k, v in self.__dict__.items()
+                        if v is not None and v is not True})
+        new_dic['kind'] = new_dic.pop('constraint_type')
+        dict_order = {'kind': None,
+                      'items': "",
+                      'reference': None,
+                      'props': None}
+        dict_order.update(new_dic)
+        return {k: v for k, v in dict_order.items() if v is not None}
 
 
 class ConstraintDetail:
-    def __init__(self, id=None, constraint_id=None, position=None, field_id=None):
-        self.id = id
-        self.constraint_id = constraint_id
-        self.position = position
-        self.field_id = field_id
+    def __init__(self, d):
+        self.id = d['id']
+        self.constraint_id = d['constraint_id']
+        self.position = d['position']
+        self.field_id = d['field_id']
 
 
 class Index:
@@ -113,7 +162,10 @@ class Index:
         self.uuid = d['uuid']
 
     def get_attributes(self):
-        return {k: v for k, v in self.__dict__.items() if v is not None and not k == "table_id"}
+        dic = copy.copy(self.__dict__)
+        dic['field'] = dic.pop('name')
+        dic['props'] = dic.pop('kind')
+        return {k: v for k, v in dic.items() if v is not None}
 
 
 class IndexDetail:
