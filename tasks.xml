@@ -274,7 +274,7 @@
     <domain name="ХешПароль" type="STRING" align="L" width="40" props="case_sensitive" char_length="40"/>
   </domains>
   <tables>
-    <table name="ACCOUNT" description="Счета" props="add, edit" ht_table_flags="rws" >
+    <table name="ACCOUNT" description="Счета" props="add, edit" >
       <field name="id_ACC" rname="id_ACC" domain="id_ACC" props="autocalculated"/>
       <field name="KodDogovor" rname="КодДоговор" domain="КодДоговор" props="input, edit, show_in_details"/>
       <field name="N_scheta" rname="N счета" domain="N счета" props="input, edit, show_in_grid, show_in_details, required"/>
@@ -290,7 +290,7 @@
       <index field="N_scheta"/>
       <index field="Summa"/>
     </table>
-    <table name="ACT" description="Акты о выполненных работах" props="add, edit" ht_table_flags="rws" >
+    <table name="ACT" description="Акты о выполненных работах" props="add, edit" >
       <field name="id_ACT" rname="id_ACT" domain="id_ACT" props="autocalculated"/>
       <field name="KodDogovor" rname="КодДоговор" domain="КодДоговор" props="input, edit, show_in_grid, show_in_details, is_mean"/>
       <field name="Klient" rname="Клиент" domain="КодКлиента" props="input, edit, show_in_grid, show_in_details, is_mean"/>
@@ -308,7 +308,7 @@
       <index field="UtvPostav_"/>
       <index field="UtvZakazch_"/>
     </table>
-    <table name="ADDRESS" description="Адреса" props="add, edit" ht_table_flags="rws" >
+    <table name="ADDRESS" description="Адреса" props="add, edit" >
       <field name="KodAdresa" rname="КодАдреса" domain="КодАдреса" props="show_in_details, autocalculated"/>
       <field name="KodKlienta" rname="КодКлиента" domain="КодКлиента" props="input, edit, show_in_details, is_mean"/>
       <field name="Region" rname="Регион" domain="Регион" props="input, show_in_grid, show_in_details, is_mean"/>
@@ -327,7 +327,7 @@
       <index field="Region"/>
       <index field="Ulicza"/>
     </table>
-    <table name="ARTICLES" description="Статьи" props="add, edit, delete" ht_table_flags="rws" >
+    <table name="ARTICLES" description="Статьи" props="add, edit, delete" >
       <field name="ID_punkta" rname="ID пункта" domain="ID пункта" props="show_in_details"/>
       <field name="TextData" rname="TextData" domain="TextData" props="input, edit, show_in_details"/>
       <field name="DataIzmen_" rname="ДатаИзмен." domain="ДатаИзмен." props="show_in_details"/>
@@ -343,7 +343,7 @@
       <index field="TextData" props="fulltext"/>
       <index field="VremyaIzmen"/>
     </table>
-    <table name="BANC_REC" description="Банковские реквиз. организаций" props="add, edit, delete" ht_table_flags="rws" >
+    <table name="BANC_REC" description="Банковские реквиз. организаций" props="add, edit, delete" >
       <field name="KodKlienta" rname="КодКлиента" domain="КодКлиента" props="input, show_in_grid, show_in_details, is_mean, required"/>
       <field name="Bank" rname="Банк" domain="Банк" props="input, edit, show_in_grid, show_in_details, required"/>
       <field name="Rschet" rname="Р/счет" domain="Р/счет" props="input, edit, show_in_grid, show_in_details"/>
@@ -361,14 +361,14 @@
       <index field="OKPO"/>
       <index field="Rschet"/>
     </table>
-    <table name="CATEGORY" description="Справочник категорий" props="add, edit, delete" ht_table_flags="rws" >
+    <table name="CATEGORY" description="Справочник категорий" props="add, edit, delete" >
       <field name="Kategoriya" rname="Категория" domain="Категория" props="input, show_in_grid, show_in_details, autocalculated"/>
       <field name="Naimenovan" rname="Наименован" domain="Наименован" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="PolnoeNaim" rname="ПолноеНаим" domain="ПолноеНаим" props="input, edit, show_in_details"/>
       <constraint kind="PRIMARY" items="Kategoriya"/>
       <index field="Naimenovan" props="uniqueness"/>
     </table>
-    <table name="CERTIFIC" description="Выданные удостоверения" props="add, edit" ht_table_flags="rws" >
+    <table name="CERTIFIC" description="Выданные удостоверения" props="add, edit" >
       <field name="KodUdostov" rname="КодУдостов" domain="КодУдостов" props="show_in_details, autocalculated"/>
       <field name="KodSotrudn" rname="КодСотрудн" domain="КодСотрудн" description="Владелец удостоверения" props="input, edit, show_in_details, is_mean, required"/>
       <field name="NomUdost_" rname="НомУдост." domain="НомУдост." props="input, edit, show_in_grid, show_in_details, required"/>
@@ -381,12 +381,12 @@
       <index field="KodSotrudn"/>
       <index field="NomUdost_" props="uniqueness"/>
     </table>
-    <table name="CHAP_REF" description="Справочник разделов" ht_table_flags="rs" >
+    <table name="CHAP_REF" description="Справочник разделов" >
       <field name="Razdel" rname="Раздел" domain="Раздел" props="show_in_grid, show_in_details"/>
       <field name="Naimenovan" rname="Наименован" domain="Наименован" props="show_in_grid, show_in_details, is_mean"/>
       <constraint kind="PRIMARY" items="Razdel"/>
     </table>
-    <table name="CLIENT" description="Клиенты" props="add, edit" ht_table_flags="rws" >
+    <table name="CLIENT" description="Клиенты" props="add, edit" >
       <field name="KodKlienta" rname="КодКлиента" domain="КодКлиента" props="show_in_details, autocalculated"/>
       <field name="Organizacz_" rname="Организац." domain="Организац." props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="KodVedomst" rname="КодВедомст" domain="КодВедомст" description="Ведомство" props="input, edit, show_in_details, required"/>
@@ -399,7 +399,7 @@
       <index field="Organizacz_" props="uniqueness"/>
       <index field="Podrazd_"/>
     </table>
-    <table name="CNTR_PAR" description="Контрольные параметры" props="add" ht_table_flags="rws" >
+    <table name="CNTR_PAR" description="Контрольные параметры" props="add" >
       <field name="KodParam" rname="КодПарам" domain="КодПарам" props="show_in_details, autocalculated"/>
       <field name="KontrParam" rname="КонтрПарам" domain="КонтрПарам" description="Контролировать" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="KodParam"/>
@@ -1053,12 +1053,12 @@
       <index field="NePokazyv_"/>
       <index field="NeVybirat"/>
     </table>
-    <table name="MENUITEM" description="Элементы меню" ht_table_flags="rs" >
+    <table name="MENUITEM" description="Элементы меню" >
       <field name="IndeksMenyu" rname="ИндексМеню" domain="ИндексМеню" props="input, show_in_grid, show_in_details"/>
       <field name="Naimenovan" rname="Наименован" domain="Название" description="Расположение" props="show_in_grid, show_in_details, is_mean"/>
       <constraint kind="PRIMARY" items="IndeksMenyu"/>
     </table>
-    <table name="MULTIDEF" description="Внешние средства" ht_table_flags="s" >
+    <table name="MULTIDEF" description="Внешние средства" >
       <field name="mmFileName" rname="mmFileName" domain="mmFileName" props="input, edit, show_in_grid, show_in_details, required"/>
       <field name="KodMulti" rname="КодМульти" domain="КодМульти" props="input, show_in_grid, show_in_details, autocalculated, required"/>
       <field name="mmSubName" rname="mmSubName" domain="mmSubName" props="input, edit, show_in_grid, show_in_details, required"/>
@@ -1089,7 +1089,7 @@
       <index field="Data"/>
       <index field="N"/>
     </table>
-    <table name="PCMDS" description="Справочник команд печати" ht_table_flags="s" >
+    <table name="PCMDS" description="Справочник команд печати" >
       <field name="KodKomandy" rname="КодКоманды" domain="КодКоманды" props="show_in_grid, show_in_details, autocalculated"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="SimvKomand" rname="СимвКоманд" domain="СимвКоманд" props="input, edit, show_in_grid, show_in_details, required"/>
@@ -1400,7 +1400,7 @@
       <index field="KlyuchNastr" props="uniqueness"/>
       <index field="ZnachTekst"/>
     </table>
-    <table name="SLOVO3" description="Справочник областей" ht_table_flags="s" >
+    <table name="SLOVO3" description="Справочник областей" >
       <field name="KodOblasti" rname="КодОбласти" domain="КодОбласти" props="input, show_in_grid, show_in_details, autocalculated, required"/>
       <field name="NazvOblast" rname="НазвОбласт" domain="НазвОбласт" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="KodGosva" rname="КодГос-ва" domain="КодГос-ва" props="input, edit, show_in_details, required"/>
@@ -1412,7 +1412,7 @@
       <index field="NazvGICZ"/>
       <index field="NazvOblast" props="uniqueness"/>
     </table>
-    <table name="SLV_CLN" description="Чистка словарей" ht_table_flags="s" >
+    <table name="SLV_CLN" description="Чистка словарей" >
       <field name="IDC" rname="IDC" domain="IDC" props="input, show_in_grid, show_in_details, autocalculated, required"/>
       <field name="KodTabliczy" rname="КодТаблицы" domain="КодТаблицы" props="input, edit, show_in_grid, show_in_details, required"/>
       <field name="Slovar" rname="Словарь" domain="Таблица" props="input, edit, show_in_grid, show_in_details, required"/>
@@ -1429,7 +1429,7 @@
       <index field="Slovar"/>
       <index field="Spisok"/>
     </table>
-    <table name="SPR038" description="Справочник подразделений" ht_table_flags="s" >
+    <table name="SPR038" description="Справочник подразделений" >
       <field name="KodPodrazd" rname="КодПодразд" domain="КодПодразд" props="input, show_in_grid, show_in_details, autocalculated, required"/>
       <field name="NazvPodr_" rname="НазвПодр." domain="НазвПодр." props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="LiniyaSluzh_" rname="ЛинияСлуж." domain="ЛинияСлуж." props="show_in_details"/>
@@ -1464,7 +1464,7 @@
       <index field="ImyaStanczii" props="uniqueness"/>
       <index field="Uroven"/>
     </table>
-    <table name="SU_PROGR" description="Справочник программ" ht_table_flags="s" >
+    <table name="SU_PROGR" description="Справочник программ" >
       <field name="TipProgr_" rname="ТипПрогр." domain="ТипПрогр." props="show_in_grid, show_in_details, autocalculated"/>
       <field name="NazvProgr_" rname="НазвПрогр." domain="НазвПрогр." props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="KodVedomst" rname="КодВедомст" domain="КодВедомст" props="input, edit, show_in_grid, show_in_details"/>
@@ -1487,7 +1487,7 @@
       <index field="NazvRajona"/>
       <index field="Region"/>
     </table>
-    <table name="S_CONT" description="Справочник окраски" ht_table_flags="s" >
+    <table name="S_CONT" description="Справочник окраски" >
       <field name="TipKontakt" rname="ТипКонтакт" domain="ТипКонтакт" props="input, show_in_grid, show_in_details, autocalculated, required"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="TipKontakt"/>
@@ -1498,7 +1498,7 @@
       <field name="Dogovor" rname="Договор" domain="Название" description="Название договора" props="input, edit, show_in_grid, show_in_details, is_mean"/>
       <constraint kind="PRIMARY" items="TipDogovor"/>
     </table>
-    <table name="S_FILETP" description="Справочник типов файлов" ht_table_flags="s" >
+    <table name="S_FILETP" description="Справочник типов файлов" >
       <field name="Tip_fajla" rname="Тип файла" domain="Тип файла" props="input, show_in_grid, show_in_details, autocalculated, required"/>
       <field name="Rasshirenie" rname="Расширение" domain="Расширение" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
@@ -1506,13 +1506,13 @@
       <index field="Nazvanie"/>
       <index field="Rasshirenie" props="uniqueness"/>
     </table>
-    <table name="S_GRAM" description="Уровень грамотности" ht_table_flags="s" >
+    <table name="S_GRAM" description="Уровень грамотности" >
       <field name="UrovGram_" rname="УровГрам." domain="УровГрам." props="show_in_grid, show_in_details, autocalculated"/>
       <field name="Gramotn_" rname="Грамотн." domain="Грамотн." props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="UrovGram_"/>
       <index field="Gramotn_" props="uniqueness"/>
     </table>
-    <table name="S_IN_OUT" description="Справочник входящий\исходящий" ht_table_flags="s" >
+    <table name="S_IN_OUT" description="Справочник входящий\исходящий" >
       <field name="KodVxIsx" rname="КодВх\Исх" domain="КодВх\Исх" props="show_in_grid, show_in_details, autocalculated"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="KodVxIsx"/>
@@ -1551,13 +1551,13 @@
       <index field="Nazvanie" props="uniqueness"/>
       <index field="NePokazyv_"/>
     </table>
-    <table name="S_OCENK" description="Справочник точности оценки" ht_table_flags="s" >
+    <table name="S_OCENK" description="Справочник точности оценки" >
       <field name="KodTochnost" rname="КодТочност" domain="КодТочност" props="show_in_grid, show_in_details, autocalculated"/>
       <field name="Tochnost" rname="Точность" domain="Точность" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="KodTochnost"/>
       <index field="Tochnost" props="uniqueness"/>
     </table>
-    <table name="S_ORG_M1" description="Официальные органы" ht_table_flags="s" >
+    <table name="S_ORG_M1" description="Официальные органы" >
       <field name="KodOrgM1" rname="КодОргМ1" domain="КодОргМ1" props="input, show_in_details, autocalculated, required"/>
       <field name="KodCZBDUIG" rname="КодЦБДУИГ" domain="КодЦБДУИГ" props="input, edit, show_in_grid, show_in_details, required"/>
       <field name="OrganFMS" rname="ОрганФМС" domain="ОрганФМС" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
@@ -1577,13 +1577,13 @@
       <constraint kind="PRIMARY" items="KodOtdela"/>
       <index field="Nazvanie" props="uniqueness"/>
     </table>
-    <table name="S_POSTUP" description="Виды поступления заявки" ht_table_flags="s" >
+    <table name="S_POSTUP" description="Виды поступления заявки" >
       <field name="KodPostupl" rname="КодПоступл" domain="КодПоступл" props="show_in_grid, show_in_details, autocalculated"/>
       <field name="Nazvanie" rname="Название" domain="НазвПоступ" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="KodPostupl"/>
       <index field="Nazvanie" props="uniqueness"/>
     </table>
-    <table name="S_PRIOR" description="Приоритеты" ht_table_flags="s" >
+    <table name="S_PRIOR" description="Приоритеты" >
       <field name="KodPriorit" rname="КодПриорит" domain="КодПриорит" props="show_in_grid, show_in_details, autocalculated"/>
       <field name="Nazvanie" rname="Название" domain="Приоритет" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="Kritichnt" rname="Критичн-ть" domain="Критичн-ть" props="input, edit, show_in_details, required"/>
@@ -1601,19 +1601,19 @@
       <field name="Naimenovan" rname="Наименован" domain="Наименован" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="KodRezult"/>
     </table>
-    <table name="S_REGSOF" description="Справочник источника выгрузки" ht_table_flags="s" >
+    <table name="S_REGSOF" description="Справочник источника выгрузки" >
       <field name="KodPeredach" rname="КодПередач" domain="КодПередач" props="show_in_grid, show_in_details, autocalculated"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="KodPeredach"/>
       <index field="Nazvanie" props="uniqueness"/>
     </table>
-    <table name="S_STATUS" description="Статус заявки" ht_table_flags="s" >
+    <table name="S_STATUS" description="Статус заявки" >
       <field name="KodStatusa" rname="КодСтатуса" domain="КодСтатуса" props="show_in_grid, show_in_details, autocalculated"/>
       <field name="Nazvanie" rname="Название" domain="Статус" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="KodStatusa"/>
       <index field="Nazvanie" props="uniqueness"/>
     </table>
-    <table name="S_STRGTP" description="Типы ресурсов" ht_table_flags="s" >
+    <table name="S_STRGTP" description="Типы ресурсов" >
       <field name="KodTipRes" rname="КодТипРес" domain="КодТипРес" props="input, show_in_grid, show_in_details, autocalculated"/>
       <field name="Naimenovan" rname="Наименован" domain="Наименован" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="KodTipRes"/>
@@ -1633,13 +1633,13 @@
       <index field="Tablicza" props="uniqueness"/>
       <index field="Uroven"/>
     </table>
-    <table name="S_TECH" description="Тип обучения" ht_table_flags="s" >
+    <table name="S_TECH" description="Тип обучения" >
       <field name="TipObuch_" rname="ТипОбуч." domain="ТипОбуч." props="show_in_grid, show_in_details, autocalculated"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="TipObuch_"/>
       <index field="Nazvanie" props="uniqueness"/>
     </table>
-    <table name="S_TPCONT" description="Тип заявки" ht_table_flags="s" >
+    <table name="S_TPCONT" description="Тип заявки" >
       <field name="KodTipaKon" rname="КодТипаКон" domain="КодТипаКон" props="input, show_in_grid, show_in_details"/>
       <field name="Nazvanie" rname="Название" domain="НазвТипа" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="SBK" rname="СБК" domain="СБК" props="show_in_details"/>
@@ -1647,25 +1647,25 @@
       <index field="Nazvanie" props="uniqueness"/>
       <index field="SBK"/>
     </table>
-    <table name="S_TP_EXP" description="Типы экспорта" ht_table_flags="s" >
+    <table name="S_TP_EXP" description="Типы экспорта" >
       <field name="TipEksport" rname="ТипЭкспорт" domain="ТипЭкспорт" props="input, show_in_grid, show_in_details, autocalculated, required"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="TipEksport"/>
       <index field="Nazvanie" props="uniqueness"/>
     </table>
-    <table name="S_VAJN" description="Справочник степени важности" ht_table_flags="s" >
+    <table name="S_VAJN" description="Справочник степени важности" >
       <field name="KodVazhn_" rname="КодВажн." domain="КодВажн." props="input, show_in_grid, show_in_details, autocalculated, required"/>
       <field name="Vazhnost" rname="Важность" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="KodVazhn_"/>
       <index field="Vazhnost" props="uniqueness"/>
     </table>
-    <table name="S_VEDOMS" description="Справочник ведомств" ht_table_flags="s" >
+    <table name="S_VEDOMS" description="Справочник ведомств" >
       <field name="KodVedomst" rname="КодВедомст" domain="КодВедомст" props="show_in_grid, show_in_details, autocalculated"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="KodVedomst"/>
       <index field="Nazvanie" props="uniqueness"/>
     </table>
-    <table name="S_WORK" description="Виды работ по заявке" ht_table_flags="s" >
+    <table name="S_WORK" description="Виды работ по заявке" >
       <field name="KodVidRab" rname="КодВидРаб" domain="КодВидРаб" props="show_in_grid, show_in_details, autocalculated"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="KodStatusa" rname="КодСтатуса" domain="КодСтатуса" props="input, edit, show_in_details"/>
