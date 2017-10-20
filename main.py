@@ -19,7 +19,10 @@ def parse_domain_props(props=None):
 def parse_const_props(dic=None):
     if 'props' in dic.keys():
         for s in dic['props'].split(', '):
-            dic[s] = True
+            if s == "full_cascading_delete":
+                dic['cascading_delete'] = True
+            else:
+                dic[s] = True
     dic['constraint_type'] = dic['kind']
     return dic
 
@@ -92,7 +95,7 @@ def xml_to_ram(filename):
                                     'unique_key_id': None,
                                     'has_value_edit': None,
                                     'cascading_delete': None,
-                                    'full_cascading_delete': None,
+                                    # 'full_cascading_delete': None,
                                     'expression': None,
                                     'props': None,
                                     'uuid': None,
@@ -256,9 +259,9 @@ def ram_to_xml(database_schema):
     print(st.getvalue())
 
 
-# ram_to_xml(xml_to_ram('prjadm.xdb.xml'))
-# ram_to_xml(xml_to_ram('tasks.xml'))
 try:
-    ram_to_xml(xml_to_ram('tst.xml'))
+    # ram_to_xml(xml_to_ram('prjadm.xdb.xml'))
+    ram_to_xml(xml_to_ram('tasks.xml'))
+    # ram_to_xml(xml_to_ram('tst.xml'))
 except Exception as e:
     print(e)
