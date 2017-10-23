@@ -76,7 +76,7 @@ class Table:
                 s += k[4:] + ', '
         if not s == "":
             dict_order['props'] = s[:-2]
-        return {k: v for k, v in dict_order.items() if v is not None}
+        return {k: v for k, v in dict_order.items() if v is not None and k[-2:] != "id"}
 
 
 class Field:
@@ -142,20 +142,28 @@ class Constraint:
 
     def get_attributes(self):
         new_dict = {}
-        if self.__dict__['constraint_type'] == 'FOREIGN':
-            if self.__dict__['cascading_delete'] is True:
-                new_dict['props'] = 'full_cascading_delete'
-            elif self.__dict__['cascading_delete'] is False:
-                new_dict['props'] = 'cascading_delete'
+        if any(value is True or value is False for value in self.__dict__.values()):
+            a = self.__dict__.values()
+            b = [True, False, None] in a
+            new_dict['props'] = ""
+            if self.__dict__['has_value_edit'] is True:
+                new_dict['props'] = 'has_value_edit'
+            if self.__dict__['cascading_delete'] is not None:
+                if self.__dict__['has_value_edit'] is not None:
+                    new_dict['props'] += ', '
+                if self.__dict__['cascading_delete'] is True:
+                    new_dict['props'] += 'full_cascading_delete'
+                elif self.__dict__['cascading_delete'] is False:
+                    new_dict['props'] += 'cascading_delete'
         new_dict.update({k: v for k, v in self.__dict__.items()
-                        if v is not None and v is not True})
+                        if v not in [True, False, None]})
         new_dict['kind'] = new_dict.pop('constraint_type')
         dict_order = {'kind': None,
                       'items': "",
                       'reference': None,
                       'props': None}
         dict_order.update(new_dict)
-        return {k: v for k, v in dict_order.items() if v not in [True, False, None]}
+        return {k: v for k, v in dict_order.items() if v is not None}
 
 
 class ConstraintDetail:

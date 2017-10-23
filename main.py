@@ -5,7 +5,7 @@ from minidom_fixed import *
 from io import StringIO
 from custom_exception import *
 
-# сравнение: fc /N tst.xml filename.xml
+# сравнение: fc /N tasks.xml filename.xml
 
 
 def parse_table_props(props=None):
@@ -17,12 +17,13 @@ def parse_domain_props(props=None):
 
 
 def parse_const_props(dic=None):
-    if 'props' in dic.keys() and dic['kind'] == "FOREIGN":
-        for s in dic['props'].split(', '):
-            if s == "full_cascading_delete":
-                dic['cascading_delete'] = True
-            elif s == "cascading_delete":
-                dic[s] = False
+    if 'props' in dic.keys():
+        if 'full_cascading_delete' in dic['props']:
+            dic['cascading_delete'] = True
+        elif 'cascading_delete' in dic['props']:
+            dic['cascading_delete'] = False
+        if 'has_value_edit' in dic['props']:
+            dic['has_value_edit'] = True
     dic['constraint_type'] = dic['kind']
     return dic
 
@@ -110,15 +111,15 @@ def xml_to_ram(filename):
                                'uuid': None}}
 
     domains = []
-    for node in dom.getElementsByTagName('domain'):
-        domain_attrib = dict(node.attributes.items())
+    for domain in dom.getElementsByTagName('domain'):
+        domain_attrib = dict(domain.attributes.items())
         init_dict = dict(dict(database_dict['domain'],
                               **parse_domain_props(domain_attrib['props'])
                               if 'props' in domain_attrib.keys() else {}),
                          **domain_attrib)
         if set(init_dict.keys()) > set(database_dict['domain'].keys()):
             raise DBException("domains")
-        domain_attrib['id'] = domain_id
+        init_dict['id'] = domain_id
         domain_id += 1
         domains.append(Domain(init_dict))
 
@@ -134,7 +135,7 @@ def xml_to_ram(filename):
                            **table_attributes)
             if set(init_dict.keys()) > set(database_dict['table'].keys()):
                 raise DBException("tables")
-            table_attributes['id'] = table_id
+            init_dict['id'] = table_id
             t = Table(init_dict)
             tables[t] = {'field': [],
                          'constraint': [],
@@ -154,9 +155,10 @@ def xml_to_ram(filename):
                         child_node_attrib['domain_id'] = None
                         for domain in domains:
                             if child_node_attrib['domain'] == domain.name:
-                                child_node_attrib['domain_id'] = domain.id
-                        child_node_attrib['table_id'] = table_id
-                        child_node_attrib['id'] = field_id
+                                init_dict['domain_id'] = domain.id
+                                break
+                        init_dict['table_id'] = table_id
+                        init_dict['id'] = field_id
                         field_id += 1
                         tables[t]['field'].append(Field(init_dict))
                     if child.tagName == 'constraint':
@@ -253,10 +255,10 @@ def ram_to_xml(database_schema):
 
     st = StringIO()
     doc.writexml(st, '', '  ', '\n', 'utf-8')
-    # file_handle = open("filename.xml", "wb")
-    # file_handle.write(st.getvalue().encode())
-    # file_handle.close()
     print(st.getvalue())
+    file_handle = open("filename.xml", "wb")
+    file_handle.write(st.getvalue().encode())
+    file_handle.close()
 
 
 try:
