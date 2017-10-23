@@ -141,13 +141,12 @@ class Constraint:
         self.uuid = init_dict['uuid']
 
     def get_attributes(self):
-        s = ""
-        for k, v in self.__dict__.items():
-            if v is True:
-                s += k + ', '
         new_dict = {}
-        if not s == "":
-            new_dict['props'] = s[:-2]
+        if self.__dict__['constraint_type'] == 'FOREIGN':
+            if self.__dict__['cascading_delete'] is True:
+                new_dict['props'] = 'full_cascading_delete'
+            elif self.__dict__['cascading_delete'] is False:
+                new_dict['props'] = 'cascading_delete'
         new_dict.update({k: v for k, v in self.__dict__.items()
                         if v is not None and v is not True})
         new_dict['kind'] = new_dict.pop('constraint_type')
@@ -156,7 +155,7 @@ class Constraint:
                       'reference': None,
                       'props': None}
         dict_order.update(new_dict)
-        return {k: v for k, v in dict_order.items() if v is not None}
+        return {k: v for k, v in dict_order.items() if v not in [True, False, None]}
 
 
 class ConstraintDetail:

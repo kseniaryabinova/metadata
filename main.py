@@ -17,12 +17,12 @@ def parse_domain_props(props=None):
 
 
 def parse_const_props(dic=None):
-    if 'props' in dic.keys():
+    if 'props' in dic.keys() and dic['kind'] == "FOREIGN":
         for s in dic['props'].split(', '):
             if s == "full_cascading_delete":
                 dic['cascading_delete'] = True
-            else:
-                dic[s] = True
+            elif s == "cascading_delete":
+                dic[s] = False
     dic['constraint_type'] = dic['kind']
     return dic
 
