@@ -1,41 +1,129 @@
 # дедлайн - первые 2 задания до 21 октября
+# 4 задача должна быть выложена до начала декабря
 from xml.dom.minidom import parse
 from metadata import *
 from minidom_fixed import *
 from io import StringIO
 from custom_exception import *
+# TODO исправить import *
 
 # сравнение: fc /N tasks.xml filename.xml
 
 
-def parse_table_props(props=None):
-    return {'can_' + s: True for s in props.split(', ')}
-
-
 def parse_domain_props(props=None):
-    return {s: True for s in props.split(', ')}
+    props_dict = {}
+    for prop in props.split(', '):
+        if prop == 'show_null':
+            props_dict['show_null'] = True
+        elif prop == 'show_lead_nulls':
+            props_dict['show_lead_nulls'] = True
+        elif prop == 'thousands_separator':
+            props_dict['thousands_separator'] = True
+        elif prop == 'summable':
+            props_dict['summable'] = True
+        elif prop == 'case_sensitive':
+            props_dict['case_sensitive'] = True
+    return props_dict
 
 
-def parse_const_props(dic=None):
-    if 'props' in dic.keys():
-        if 'full_cascading_delete' in dic['props']:
-            dic['cascading_delete'] = True
-        elif 'cascading_delete' in dic['props']:
-            dic['cascading_delete'] = False
-        if 'has_value_edit' in dic['props']:
-            dic['has_value_edit'] = True
-    dic['constraint_type'] = dic['kind']
-    return dic
+def parse_domain(attributes):
+    if set(attributes.keys()) > {'name', 'description', 'data_type_id',
+                                 'length', 'char_length', 'precision',
+                                 'scale', 'width', 'align', 'props'}:
+        attributes.update(parse_domain_props(attributes['props']))
+        return attributes
+    else:
+        raise Exception
 
 
-def parse_index_props(props=None):
-    return {'kind': s for s in props.split(', ')}
+def parse_table_props(props=None):
+    props_dict = {}
+    for prop in props.split(', '):
+        if prop == 'add':
+            props_dict['can_add'] = True
+        elif prop == 'edit':
+            props_dict['can_edit'] = True
+        elif prop == 'delete':
+            props_dict['can_delete'] = True
+    return props_dict
+
+
+def parse_table(attributes):
+    if set(attributes.keys()) > {'name', 'description', 'temporal_mode', 'means', 'props'}:
+        attributes.update(parse_table_props(attributes['props']))
+        return attributes
+    else:
+        raise Exception
 
 
 def parse_field_props(props=None):
-    props = props.replace('input', 'can_input')
-    props = props.replace('edit', 'can_edit')
-    return {s: True for s in props.split(', ')}
+    props_dict = {}
+    for prop in props.split(', '):
+        if prop == 'input':
+            props_dict['can_input'] = True
+        elif prop == 'edit':
+            props_dict['can_edit'] = True
+        elif prop == 'show_in_grid':
+            props_dict['show_in_grid'] = True
+        elif prop == 'show_in_details':
+            props_dict['show_in_details'] = True
+        elif prop == 'is_mean':
+            props_dict['is_mean'] = True
+        elif prop == 'autocalculated':
+            props_dict['autocalculated'] = True
+        elif prop == 'required':
+            props_dict['required'] = True
+    return props_dict
+
+
+def parse_field(attributes):
+    if set(attributes.keys()) > {'position', 'name', 'rname', 'description', 'domain', 'props'}:
+        attributes.update(parse_field_props(attributes['props']))
+        attributes['russian_short_name'] = attributes.pop('rname')
+        return attributes
+    else:
+        raise Exception
+
+
+def parse_const_props(props=None):
+    props_dict = {}
+    for prop in props.split(', '):
+        if prop == 'full_cascading_delete':
+            props_dict['cascading_delete'] = True
+        elif prop == 'cascading_delete':
+            props_dict['cascading_delete'] = False
+        elif prop == 'has_value_edit':
+            props_dict['has_value_edit'] = True
+    return props_dict
+    # const_props_dict['constraint_type'] = const_props_dict['kind']
+
+
+def parse_const(attributes):
+    if set(attributes.keys()) > {'name', 'constraint_type', 'reference', 'props', 'expression',
+                                 'kind', 'items'}:
+        attributes.update(parse_const_props(attributes['props']))
+        return attributes
+    else:
+        raise Exception
+
+
+def parse_index_props(props=None):
+    if props is not None:
+        return {'kind': props}
+    else:
+        {}
+
+
+def parse_index(attributes):
+    if set(attributes.keys()) > {'name', 'props', 'kind', 'field'}:
+        attributes.update(parse_index_props(attributes['props']))
+        return attributes
+    else:
+        raise Exception
+
+
+def create_object(obj, parse_func):
+    pass
 
 
 def xml_to_ram(filename):

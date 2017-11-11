@@ -165,13 +165,13 @@
     <domain name="ЦифрЗапят" type="BYTE" align="L" width="3"/>
   </domains>
   <tables>
-    <table name="ALIGN" description="Выравнивание" >
+    <table name="ALIGN" description="Выравнивание">
       <field name="KodVyravn_" rname="КодВыравн." domain="КодВыравн." props="show_in_grid, autocalculated"/>
       <field name="Vyravniv" rname="Выравнив" domain="Выравнив" description="Выравнивание" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="KodVyravn_"/>
       <index field="Vyravniv" props="uniqueness"/>
     </table>
-    <table name="CASCDEL" description="Каскадное удаление" >
+    <table name="CASCDEL" description="Каскадное удаление">
       <field name="KodKaskad" rname="КодКаскад" domain="КодКаскад" props="input, show_in_grid, show_in_details, autocalculated, required"/>
       <field name="VidKaskad" rname="ВидКаскад" domain="ВидКаскад" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="KodKaskad"/>
@@ -183,7 +183,7 @@
       <constraint kind="PRIMARY" items="Razdel"/>
       <index field="Naimenovan" props="uniqueness"/>
     </table>
-    <table name="CONSDTLS" description="Детали ограничений таблиц" props="add, edit, delete" >
+    <table name="CONSDTLS" description="Детали ограничений таблиц" props="add, edit, delete">
       <field name="idCONSDTLS" rname="idCONSDTLS" domain="idCONSDTLS" props="show_in_grid, show_in_details, autocalculated"/>
       <field name="KodOgranich" rname="КодОгранич" domain="КодОгранич" props="input, show_in_grid, show_in_details, required"/>
       <field name="Poryadok" rname="Порядок" domain="Порядок" props="input, edit, show_in_grid, show_in_details"/>
@@ -202,7 +202,7 @@
       <index field="Poryadok"/>
       <index field="VremyaIzmen"/>
     </table>
-    <table name="CONSTRNT" description="Ограничения таблиц" props="add, edit, delete" >
+    <table name="CONSTRNT" description="Ограничения таблиц" props="add, edit, delete">
       <field name="KodOgranich" rname="КодОгранич" domain="КодОгранич" props="show_in_grid, show_in_details, autocalculated"/>
       <field name="ID_Tabliczy" rname="ID Таблицы" domain="ID Таблицы" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="ImyaOgranich" rname="ИмяОгранич" domain="Название" description="Имя ограничения для СУБД" props="input, edit, show_in_grid, show_in_details, is_mean"/>
@@ -232,13 +232,13 @@
       <index field="Vn_Klyuch"/>
       <index field="VremyaIzmen"/>
     </table>
-    <table name="CONSTYPE" description="Виды ограничений" >
+    <table name="CONSTYPE" description="Виды ограничений">
       <field name="VidOgranich" rname="ВидОгранич" domain="ВидОгранич" props="input, show_in_grid, show_in_details, required"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="VidOgranich"/>
       <index field="Nazvanie" props="uniqueness"/>
     </table>
-    <table name="CONTINST" description="Содержимое инсталляц. архивов" props="add, edit, delete" >
+    <table name="CONTINST" description="Содержимое инсталляц. архивов" props="add, edit, delete">
       <field name="VidInst" rname="ВидИнст" domain="ВидИнст" props="input, edit, show_in_grid, show_in_details, required"/>
       <field name="UrovKat" rname="УровКат" domain="Уровень" description="Уровень каталога в инсталляции" props="input, edit, show_in_grid, show_in_details, required"/>
       <field name="Parametr" rname="Параметр" domain="Параметр" props="input, edit, show_in_grid, show_in_details"/>
@@ -323,7 +323,7 @@
       <index field="ImyaElement" props="uniqueness"/>
       <index field="KodXran"/>
     </table>
-    <table name="DOMAINS" description="Каталог доменов" props="add, edit, delete" >
+    <table name="DOMAINS" description="Каталог доменов" props="add, edit, delete">
       <field name="KodDomena" rname="КодДомена" domain="КодДомена" props="show_in_grid, autocalculated"/>
       <field name="ImyaPolya" rname="ИмяПоля" domain="ИмяПоля" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="Opisanie" rname="Описание" domain="Описание" props="input, edit, show_in_grid"/>
@@ -389,7 +389,7 @@
       <index field="Otvetstv_"/>
       <index field="VremyaIzmen"/>
     </table>
-    <table name="EXP_PRN" description="Протокол экспорта информации" >
+    <table name="EXP_PRN" description="Протокол экспорта информации">
       <field name="KodEksport" rname="КодЭкспорт" domain="КодЭкспорт" props="show_in_grid, autocalculated"/>
       <field name="KodSeansa" rname="КодСеанса" domain="КодСеанса" props="show_in_grid"/>
       <field name="ImyaIstochn" rname="ИмяИсточн" domain="ИмяИсточн" props="edit, show_in_grid, show_in_details"/>
@@ -404,7 +404,7 @@
       <index field="TipEksport"/>
       <index field="Uspex"/>
     </table>
-    <table name="FABULA" description="Содержание задачи" props="add, edit, delete" >
+    <table name="FABULA" description="Содержание задачи" props="add, edit, delete">
       <field name="KodZadachi" rname="КодЗадачи" domain="КодЗадачи" props="input, show_in_grid, show_in_details"/>
       <field name="Soderzhanie" rname="Содержание" domain="Содержание" props="input, edit, show_in_grid"/>
       <field name="DataIzmen_" rname="ДатаИзмен." domain="ДатаИзмен." props="show_in_grid"/>
@@ -417,7 +417,7 @@
       <index field="Otvetstv_"/>
       <index field="VremyaIzmen"/>
     </table>
-    <table name="FIELDS" description="Поля таблиц" props="add, edit, delete" >
+    <table name="FIELDS" description="Поля таблиц" props="add, edit, delete">
       <field name="ID_Tabliczy" rname="ID Таблицы" domain="ID Таблицы" props="input, edit, show_in_details, required"/>
       <field name="KodPolya" rname="КодПоля" domain="КодПоля" props="show_in_grid, show_in_details, autocalculated"/>
       <field name="Poryadok" rname="Порядок" domain="Порядок" props="input, edit, show_in_grid, show_in_details"/>
@@ -469,7 +469,7 @@
       <index field="VremyaIzmen"/>
       <index field="Vvodit"/>
     </table>
-    <table name="IDXDTLS" description="Элементы индексов" props="add, edit, delete" >
+    <table name="IDXDTLS" description="Элементы индексов" props="add, edit, delete">
       <field name="idIDXDTLS" rname="idIDXDTLS" domain="idIDXDTLS" props="show_in_grid, show_in_details, autocalculated"/>
       <field name="KodIndeksa" rname="КодИндекса" domain="КодИндекса" props="input, edit, show_in_grid, show_in_details, required"/>
       <field name="Poryadok" rname="Порядок" domain="Порядок" props="input, edit, show_in_grid, show_in_details"/>
@@ -496,7 +496,7 @@
       <index field="Ubyvanie"/>
       <index field="VremyaIzmen"/>
     </table>
-    <table name="INDEXES" description="Индексы таблиц" props="add, edit, delete" >
+    <table name="INDEXES" description="Индексы таблиц" props="add, edit, delete">
       <field name="KodIndeksa" rname="КодИндекса" domain="КодИндекса" props="show_in_grid, show_in_details, autocalculated"/>
       <field name="ID_Tabliczy" rname="ID Таблицы" domain="ID Таблицы" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean"/>
@@ -521,7 +521,7 @@
       <index field="VidIndeksa"/>
       <index field="VremyaIzmen"/>
     </table>
-    <table name="KEYS" description="Типы ключей" >
+    <table name="KEYS" description="Типы ключей">
       <field name="VidIndeksa" rname="ВидИндекса" domain="ВидИндекса" props="show_in_grid, autocalculated"/>
       <field name="Klyuch" rname="Ключ" domain="Ключ" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="VidIndeksa"/>
@@ -542,7 +542,7 @@
       <constraint kind="PRIMARY" items="IndeksMenyu"/>
       <index field="Naimenovan" props="uniqueness"/>
     </table>
-    <table name="MULTIDEF" description="Внешние средства" >
+    <table name="MULTIDEF" description="Внешние средства">
       <field name="mmFileName" rname="mmFileName" domain="mmFileName" props="input, edit, show_in_grid, show_in_details, required"/>
       <field name="KodMulti" rname="КодМульти" domain="КодМульти" props="input, show_in_grid, show_in_details, autocalculated, required"/>
       <field name="mmSubName" rname="mmSubName" domain="mmSubName" props="input, edit, show_in_grid, show_in_details, required"/>
@@ -554,7 +554,7 @@
       <index field="mmFileName"/>
       <index field="mmSubName" props="uniqueness"/>
     </table>
-    <table name="PCMDS" description="Справочник команд печати" >
+    <table name="PCMDS" description="Справочник команд печати">
       <field name="KodKomandy" rname="КодКоманды" domain="КодКоманды" props="show_in_grid, show_in_details, autocalculated"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="SimvKomand" rname="СимвКоманд" domain="СимвКоманд" props="input, edit, show_in_grid, show_in_details, required"/>
@@ -563,7 +563,7 @@
       <index field="Nazvanie"/>
       <index field="SimvKomand" props="uniqueness"/>
     </table>
-    <table name="PRJ2TBLS" description="Список ведущих проектов таблиц" props="add, edit, delete" >
+    <table name="PRJ2TBLS" description="Список ведущих проектов таблиц" props="add, edit, delete">
       <field name="ID_Vedushhej" rname="ID_Ведущей" domain="ID_Ведущей" props="show_in_grid, autocalculated"/>
       <field name="KodProekta" rname="КодПроекта" domain="КодПроекта" description="Код проекта" props="input, edit, show_in_grid, show_in_details, required"/>
       <field name="ImyaVedushhej" rname="ИмяВедущей" domain="ИмяВедущей" description="Имя ведущего для таблицы проекта" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
@@ -594,7 +594,7 @@
       <index field="KodProekta"/>
       <index field="ZnachTekst"/>
     </table>
-    <table name="PRNCMDS" description="Команды принтеров" props="add, edit, delete" >
+    <table name="PRNCMDS" description="Команды принтеров" props="add, edit, delete">
       <field name="KodPrint" rname="КодПринт" domain="КодПринт" props="input, edit, show_in_grid, show_in_details, required"/>
       <field name="KodKomandy" rname="КодКоманды" domain="КодКоманды" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="StrKomandy" rname="СтрКоманды" domain="СтрКоманды" props="input, edit, show_in_grid, show_in_details, required"/>
@@ -603,7 +603,7 @@
       <index field="KodKomandy"/>
       <index field="KodPrint"/>
     </table>
-    <table name="PRNS" description="Справочник принтеров" props="add, edit, delete" >
+    <table name="PRNS" description="Справочник принтеров" props="add, edit, delete">
       <field name="KodPrint" rname="КодПринт" domain="КодПринт" props="show_in_grid, autocalculated"/>
       <field name="ImyaPrint" rname="ИмяПринт" domain="Название" description="ИмяПринтера" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="PechatBlan" rname="ПечатьБлан" domain="ПечатьБлан" props="input, edit, show_in_grid"/>
@@ -611,13 +611,13 @@
       <index field="ImyaPrint"/>
       <index field="PechatBlan"/>
     </table>
-    <table name="PROF_SCH" description="Профили схемы" props="add, edit, delete" >
+    <table name="PROF_SCH" description="Профили схемы" props="add, edit, delete">
       <field name="KodProfilya" rname="КодПрофиля" domain="КодПрофиля" props="input, show_in_grid, show_in_details, autocalculated"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean"/>
       <constraint kind="PRIMARY" items="KodProfilya"/>
       <index field="Nazvanie" props="uniqueness"/>
     </table>
-    <table name="PROJECTS" description="Проекты" props="add, edit, delete" >
+    <table name="PROJECTS" description="Проекты" props="add, edit, delete">
       <field name="KodProekta" rname="КодПроекта" domain="КодПроекта" props="show_in_grid, autocalculated"/>
       <field name="ImyaProekta" rname="ИмяПроекта" domain="Название" props="input, edit, show_in_grid, is_mean, required"/>
       <field name="Opisanie" rname="Описание" domain="Описание" props="input, edit, show_in_grid, show_in_details, required"/>
@@ -666,7 +666,7 @@
       <index field="Vvod"/>
       <index field="Vyborki"/>
     </table>
-    <table name="SEANS" description="Сеансы работы" props="delete" >
+    <table name="SEANS" description="Сеансы работы" props="delete">
       <field name="KodSeansa" rname="КодСеанса" domain="КодСеанса" props="show_in_grid, autocalculated"/>
       <field name="KodStanczii" rname="КодСтанции" domain="КодСтанции" props="edit, show_in_grid, show_in_details"/>
       <field name="DataVxoda" rname="ДатаВхода" domain="ДатаСеанса" props="edit, show_in_grid, show_in_details"/>
@@ -691,7 +691,7 @@
       <index field="KlyuchNastr" props="uniqueness"/>
       <index field="ZnachTekst"/>
     </table>
-    <table name="SLV_CLN" description="Чистка словарей" >
+    <table name="SLV_CLN" description="Чистка словарей">
       <field name="IDC" rname="IDC" domain="IDC" props="show_in_grid, show_in_details, autocalculated"/>
       <field name="KodTabliczy" rname="КодТаблицы" domain="КодТаблицы" props="input, edit, show_in_grid, show_in_details, required"/>
       <field name="Slovar" rname="Словарь" domain="Таблица" props="input, edit, show_in_grid, show_in_details, required"/>
@@ -708,7 +708,7 @@
       <index field="Slovar"/>
       <index field="Spisok"/>
     </table>
-    <table name="STATIONS" description="Рабочие станции" props="add, edit, delete" >
+    <table name="STATIONS" description="Рабочие станции" props="add, edit, delete">
       <field name="KodStanczii" rname="КодСтанции" domain="КодСтанции" props="input, show_in_grid, show_in_details, autocalculated, required"/>
       <field name="ImyaStanczii" rname="ИмяСтанции" domain="ИмяСтанции" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="Uroven" rname="Уровень" domain="Уровень" props="input, edit, show_in_grid, show_in_details, required"/>
@@ -731,7 +731,7 @@
       <constraint kind="PRIMARY" items="KodAlgIzm"/>
       <index field="Nazvanie" props="uniqueness"/>
     </table>
-    <table name="S_CAT" description="Категории задач тестирования" props="add, edit, delete" >
+    <table name="S_CAT" description="Категории задач тестирования" props="add, edit, delete">
       <field name="KodKategor" rname="КодКатегор" domain="КодКатегор" props="show_in_grid, autocalculated"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="KodProekta" rname="КодПроекта" domain="КодПроекта" props="input, edit, show_in_grid, is_mean, required"/>
@@ -746,12 +746,12 @@
       <index field="Otvetstv_"/>
       <index field="VremyaIzmen"/>
     </table>
-    <table name="S_INST" description="Справочник видов инсталляций" props="add, edit, delete" >
+    <table name="S_INST" description="Справочник видов инсталляций" props="add, edit, delete">
       <field name="VidInst" rname="ВидИнст" domain="ВидИнст" props="input, show_in_grid, show_in_details, autocalculated, required"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="VidInst"/>
     </table>
-    <table name="S_SOTR" description="Сотрудники" props="add, edit, delete" >
+    <table name="S_SOTR" description="Сотрудники" props="add, edit, delete">
       <field name="KodSotrudn" rname="КодСотрудн" domain="КодСотрудн" props="show_in_grid, autocalculated"/>
       <field name="FIO" rname="ФИО" domain="ФИО" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="KodSotrudn"/>
@@ -763,7 +763,7 @@
       <constraint kind="PRIMARY" items="KodTipRes"/>
       <index field="Naimenovan" props="uniqueness"/>
     </table>
-    <table name="S_ST_ERR" description="Состояния исправления ошибок" >
+    <table name="S_ST_ERR" description="Состояния исправления ошибок">
       <field name="KodSost" rname="КодСост" domain="КодСост" props="input, show_in_grid, show_in_details, autocalculated, required"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="KodSost"/>
@@ -800,13 +800,13 @@
       <index field="VremyaIzmen"/>
       <index field="Vydelyat"/>
     </table>
-    <table name="S_TP_EXP" description="Типы экспорта" >
+    <table name="S_TP_EXP" description="Типы экспорта">
       <field name="TipEksport" rname="ТипЭкспорт" domain="ТипЭкспорт" props="input, show_in_grid, show_in_details, autocalculated, required"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="TipEksport"/>
       <index field="Nazvanie" props="uniqueness"/>
     </table>
-    <table name="TABLES" description="Каталог таблиц" props="add, edit, delete" >
+    <table name="TABLES" description="Каталог таблиц" props="add, edit, delete">
       <field name="ID_Tabliczy" rname="ID Таблицы" domain="ID Таблицы" props="show_in_grid, autocalculated"/>
       <field name="KodProekta" rname="КодПроекта" domain="КодПроекта" props="input, edit, show_in_grid, is_mean, required"/>
       <field name="ID_Vedushhej" rname="ID_Ведущей" domain="ID_Ведущей" description="Ведущий проект" props="input, edit, show_in_details"/>
@@ -844,13 +844,13 @@
       <index field="Udalyat"/>
       <index field="VremyaIzmen"/>
     </table>
-    <table name="TABLTYPE" description="Вид таблицы" >
+    <table name="TABLTYPE" description="Вид таблицы">
       <field name="KodVidaTab" rname="КодВидаТаб" domain="КодВидаТаб" description="Вид таблицы" props="input, show_in_grid, show_in_details, required"/>
       <field name="VidTabliczy" rname="ВидТаблицы" domain="ВидТаблицы" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="KodVidaTab"/>
       <index field="VidTabliczy" props="uniqueness"/>
     </table>
-    <table name="TASKCAT" description="Категории" props="add, edit, delete" >
+    <table name="TASKCAT" description="Категории" props="add, edit, delete">
       <field name="KodZadachi" rname="КодЗадачи" domain="КодЗадачи" props="input, edit, show_in_grid, show_in_details, required"/>
       <field name="KodKategor" rname="КодКатегор" domain="КодКатегор" props="input, edit, show_in_grid, show_in_details, required"/>
       <field name="DataIzmen_" rname="ДатаИзмен." domain="ДатаИзмен." props="show_in_grid"/>
@@ -865,7 +865,7 @@
       <index field="Otvetstv_"/>
       <index field="VremyaIzmen"/>
     </table>
-    <table name="TASKS" description="Задачи тестирования" props="add, edit, delete" >
+    <table name="TASKS" description="Задачи тестирования" props="add, edit, delete">
       <field name="KodZadachi" rname="КодЗадачи" domain="КодЗадачи" props="show_in_grid, autocalculated"/>
       <field name="KodProekta" rname="КодПроекта" domain="КодПроекта" props="input, edit, show_in_grid, is_mean, required"/>
       <field name="KratSoderzh" rname="КратСодерж" domain="КратСодерж" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
@@ -880,7 +880,7 @@
       <index field="Otvetstv_"/>
       <index field="VremyaIzmen"/>
     </table>
-    <table name="TBLCSTM" description="SQL-тексты для таблиц" props="add, edit, delete" >
+    <table name="TBLCSTM" description="SQL-тексты для таблиц" props="add, edit, delete">
       <field name="id_TBLCSTM" rname="id_TBLCSTM" domain="id_TBLCSTM" props="show_in_grid, show_in_details, autocalculated"/>
       <field name="ID_Tabliczy" rname="ID Таблицы" domain="ID Таблицы" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <field name="TextData" rname="TextData" domain="TextData" props="input, edit, show_in_details"/>
@@ -898,7 +898,7 @@
       <index field="KtoVvel"/>
       <index field="Otvetstv_"/>
     </table>
-    <table name="TYPES" description="Типы" >
+    <table name="TYPES" description="Типы">
       <field name="KodTipa" rname="КодТипа" domain="КодТипа" props="show_in_grid, autocalculated"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="KodTipa"/>

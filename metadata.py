@@ -1,15 +1,37 @@
 import copy
+# TODO
+# TODO добавить validate, write методы
+# TODO убрать get_attributes
 
 
-class Schema:
-    def __init__(self, init_dict):
+class AbstractDBObject:
+    def __init__(self):
+        pass
+
+    def set_attributes(self, attr_dict):
+        pass
+
+    def is_valid(self):
+        if not self.name:
+            self.__dict__ = None
+            raise Exception
+
+
+class Schema(metaclass=AbstractDBObject):
+    def __init__(self):
+        self.fulltext_engine = None
+        self.version = None
+        self.name = None
+        self.description = None
+
+    def set_attributes(self, init_dict):
         self.fulltext_engine = init_dict['fulltext_engine']
         self.version = init_dict['version']
         self.name = init_dict['name']
         self.description = init_dict['description']
 
 
-class Domain:
+class Domain(metaclass=AbstractDBObject):
     def __init__(self, init_dict):
         self.id = init_dict['id']
         self.name = init_dict['name']
@@ -51,7 +73,7 @@ class Domain:
         return {k: v for k, v in dict_order.items() if v is not None and k[-2:] != "id"}
 
 
-class Table:
+class Table(metaclass=AbstractDBObject):
     def __init__(self, init_dict):
         self.id = init_dict['id']
         self.schema_id = init_dict['schema_id']
@@ -79,7 +101,7 @@ class Table:
         return {k: v for k, v in dict_order.items() if v is not None and k[-2:] != "id"}
 
 
-class Field:
+class Field(metaclass=AbstractDBObject):
     def __init__(self, init_dict):
         self.id = init_dict['id']
         self.table_id = init_dict['table_id']
@@ -120,14 +142,7 @@ class Field:
         return {k: v for k, v in dict_order.items() if v is not None and k[-2:] != "id"}
 
 
-class Setting:
-    def __init__(self, key=None, value=None, valueb=None):
-        self.key = key
-        self.value = value
-        self.valueb = valueb
-
-
-class Constraint:
+class Constraint(metaclass=AbstractDBObject):
     def __init__(self, init_dict):
         self.id = init_dict['id']
         self.table_id = init_dict['table_id']
@@ -166,12 +181,18 @@ class Constraint:
         return {k: v for k, v in dict_order.items() if v is not None}
 
 
-class ConstraintDetail:
+class ConstraintDetail(metaclass=AbstractDBObject):
     def __init__(self, init_dict):
         self.id = init_dict['id']
         self.constraint_id = init_dict['constraint_id']
         self.position = init_dict['position']
         self.field_id = init_dict['field_id']
+
+    def is_valid(self):
+        if not self.constraint_id or not self.field_id:
+            self.__dict__ = None
+            raise Exception
+
 
 
 class Index:
@@ -190,7 +211,7 @@ class Index:
         return {k: v for k, v in new_dict.items() if v is not None and k[-2:] != "id"}
 
 
-class IndexDetail:
+class IndexDetail(metaclass=AbstractDBObject):
     def __init__(self, id=None, index_id=None, position=None,
                  field_id=None, expression=None, descend=None):
         self.id = id
@@ -199,3 +220,8 @@ class IndexDetail:
         self.field_id = field_id
         self.expression = expression
         self.descend = descend
+
+    def is_valid(self):
+        if not self.index_id or not self.field_id:
+            self.__dict__ = None
+            raise Exception
