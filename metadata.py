@@ -4,20 +4,20 @@ import copy
 # TODO убрать get_attributes
 
 
-class AbstractDBObject:
-    def __init__(self):
-        pass
+# class AbstractDBObject:
+#     def __init__(self):
+#         pass
+#
+#     def set_attributes(self, attr_dict):
+#         pass
+#
+#     def is_valid(self):
+#         if not self.name:
+#             self.__dict__ = None
+#             raise Exception
 
-    def set_attributes(self, attr_dict):
-        pass
 
-    def is_valid(self):
-        if not self.name:
-            self.__dict__ = None
-            raise Exception
-
-
-class Schema(metaclass=AbstractDBObject):
+class Schema:
     def __init__(self):
         self.fulltext_engine = None
         self.version = None
@@ -31,25 +31,30 @@ class Schema(metaclass=AbstractDBObject):
         self.description = init_dict['description']
 
 
-class Domain(metaclass=AbstractDBObject):
-    def __init__(self, init_dict):
-        self.id = init_dict['id']
-        self.name = init_dict['name']
-        self.description = init_dict['description']
-        self.type = init_dict['type']
-        self.data_type_id = init_dict['data_type_id']
-        self.length = init_dict['length']
-        self.char_length = init_dict['char_length']
-        self.precision = init_dict['precision']
-        self.scale = init_dict['scale']
-        self.width = init_dict['width']
-        self.align = init_dict['align']
-        self.show_null = init_dict['show_null']
-        self.show_lead_nulls = init_dict['show_lead_nulls']
-        self.thousands_separator = init_dict['thousands_separator']
-        self.summable = init_dict['summable']
-        self.case_sensitive = init_dict['case_sensitive']
-        self.uuid = init_dict['uuid']
+class Domain:
+    def __init__(self):
+        self.id = None
+        self.name = None
+        self.description = None
+        self.type = None
+        self.data_type_id = None
+        self.length = None
+        self.char_length = None
+        self.precision = None
+        self.scale = None
+        self.width = None
+        self.align = None
+        self.show_null = None
+        self.show_lead_nulls = None
+        self.thousands_separator = None
+        self.summable = None
+        self.case_sensitive = None
+        self.uuid = None
+
+    def set_attributes(self, init_dict):
+        for key, value in self.__dict__.items():
+            if key in init_dict.keys():
+                self.__dict__[key] = init_dict[key]
 
     def get_attributes(self):
         dict_order = {'name': None,
@@ -72,8 +77,14 @@ class Domain(metaclass=AbstractDBObject):
             dict_order['props'] = s[:-2]
         return {k: v for k, v in dict_order.items() if v is not None and k[-2:] != "id"}
 
+    def is_valid(self):
+        if not self.name:
+            self.__dict__ = None
+            return False
+        return True
 
-class Table(metaclass=AbstractDBObject):
+
+class Table:
     def __init__(self, init_dict):
         self.id = init_dict['id']
         self.schema_id = init_dict['schema_id']
@@ -101,7 +112,7 @@ class Table(metaclass=AbstractDBObject):
         return {k: v for k, v in dict_order.items() if v is not None and k[-2:] != "id"}
 
 
-class Field(metaclass=AbstractDBObject):
+class Field:
     def __init__(self, init_dict):
         self.id = init_dict['id']
         self.table_id = init_dict['table_id']
@@ -142,7 +153,7 @@ class Field(metaclass=AbstractDBObject):
         return {k: v for k, v in dict_order.items() if v is not None and k[-2:] != "id"}
 
 
-class Constraint(metaclass=AbstractDBObject):
+class Constraint:
     def __init__(self, init_dict):
         self.id = init_dict['id']
         self.table_id = init_dict['table_id']
@@ -181,7 +192,7 @@ class Constraint(metaclass=AbstractDBObject):
         return {k: v for k, v in dict_order.items() if v is not None}
 
 
-class ConstraintDetail(metaclass=AbstractDBObject):
+class ConstraintDetail:
     def __init__(self, init_dict):
         self.id = init_dict['id']
         self.constraint_id = init_dict['constraint_id']
@@ -211,7 +222,7 @@ class Index:
         return {k: v for k, v in new_dict.items() if v is not None and k[-2:] != "id"}
 
 
-class IndexDetail(metaclass=AbstractDBObject):
+class IndexDetail:
     def __init__(self, id=None, index_id=None, position=None,
                  field_id=None, expression=None, descend=None):
         self.id = id
