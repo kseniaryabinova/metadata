@@ -232,6 +232,11 @@ class ConstraintDetail:
         self.position = None
         self.field_id = None
 
+    def set_attributes(self, init_dict):
+        for key, value in self.__dict__.items():
+            if key in init_dict.keys():
+                self.__dict__[key] = init_dict[key]
+
     def is_valid(self):
         if not self.constraint_id or not self.field_id:
             self.__dict__ = None
