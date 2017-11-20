@@ -34,6 +34,10 @@ class DbdSchema:
             return False
         return True
 
+    def get_attribute_by_name(self, name):
+        if name in self.__dict__.keys():
+            return self.__dict__[name]
+
 
 class Domain:
     def __init__(self):
@@ -60,26 +64,9 @@ class Domain:
             if key in init_dict.keys():
                 self.__dict__[key] = init_dict[key]
 
-    def get_attributes(self):
-        dict_order = {'name': None,
-                      'description': None,
-                      'type': None,
-                      'align': None,
-                      'width': None,
-                      'length': None,
-                      'precision': None,
-                      'props': None,
-                      'scale': None,
-                      'char_length': None}
-        dict_order.update({k: v for k, v in self.__dict__.items()
-                           if v is not None and v is not True})
-        s = ""
-        for k, v in self.__dict__.items():
-            if v is True:
-                s += k + ', '
-        if not s == "":
-            dict_order['props'] = s[:-2]
-        return {k: v for k, v in dict_order.items() if v is not None and k[-2:] != "id"}
+    def get_attribute_by_name(self, name):
+        if name in self.__dict__.keys():
+            return self.__dict__[name]
 
     def is_valid(self):
         if not self.name:
@@ -124,6 +111,10 @@ class Table:
             return False
         return True
 
+    def get_attribute_by_name(self, name):
+        if name in self.__dict__.keys():
+            return self.__dict__[name]
+
 
 class Field:
     def __init__(self):
@@ -143,28 +134,6 @@ class Field:
         self.required = None
         self.uuid = None
 
-    def get_attributes(self):
-        s = ""
-        for k, v in self.__dict__.items():
-            if v is True:
-                if k[:4] == "can_":
-                    s += k[4:] + ', '
-                else:
-                    s += k + ', '
-        new_dict = {}
-        if not s == "":
-            new_dict['props'] = s[:-2]
-        new_dict.update({k: v for k, v in self.__dict__.items()
-                        if v is not None and v is not True})
-        new_dict['rname'] = new_dict.pop('russian_short_name')
-        dict_order = {'name': None,
-                      'rname': None,
-                      'domain': "",
-                      'description': None,
-                      'props': None}
-        dict_order.update(new_dict)
-        return {k: v for k, v in dict_order.items() if v is not None and k[-2:] != "id"}
-
     def set_attributes(self, init_dict):
         for key, value in self.__dict__.items():
             if key in init_dict.keys():
@@ -174,6 +143,10 @@ class Field:
         if not self.name:
             return False
         return True
+
+    def get_attribute_by_name(self, name):
+        if name in self.__dict__.keys():
+            return self.__dict__[name]
 
 
 class Constraint:
@@ -189,31 +162,6 @@ class Constraint:
         self.expression = None
         self.uuid = None
 
-    def get_attributes(self):
-        new_dict = {}
-        if any(value is True or value is False for value in self.__dict__.values()):
-            a = self.__dict__.values()
-            b = [True, False, None] in a
-            new_dict['props'] = ""
-            if self.__dict__['has_value_edit'] is True:
-                new_dict['props'] = 'has_value_edit'
-            if self.__dict__['cascading_delete'] is not None:
-                if self.__dict__['has_value_edit'] is not None:
-                    new_dict['props'] += ', '
-                if self.__dict__['cascading_delete'] is True:
-                    new_dict['props'] += 'full_cascading_delete'
-                elif self.__dict__['cascading_delete'] is False:
-                    new_dict['props'] += 'cascading_delete'
-        new_dict.update({k: v for k, v in self.__dict__.items()
-                        if v not in [True, False, None]})
-        new_dict['kind'] = new_dict.pop('constraint_type')
-        dict_order = {'kind': None,
-                      'items': "",
-                      'reference': None,
-                      'props': None}
-        dict_order.update(new_dict)
-        return {k: v for k, v in dict_order.items() if v is not None}
-
     def set_attributes(self, init_dict):
         for key, value in self.__dict__.items():
             if key in init_dict.keys():
@@ -223,6 +171,10 @@ class Constraint:
         if not self.constraint_type:
             return False
         return True
+
+    def get_attribute_by_name(self, name):
+        if name in self.__dict__.keys():
+            return self.__dict__[name]
 
 
 class ConstraintDetail:
@@ -252,12 +204,6 @@ class Index:
         self.kind = None
         self.uuid = None
 
-    def get_attributes(self):
-        new_dict = copy.copy(self.__dict__)
-        new_dict['field'] = new_dict.pop('name')
-        new_dict['props'] = new_dict.pop('kind')
-        return {k: v for k, v in new_dict.items() if v is not None and k[-2:] != "id"}
-
     def set_attributes(self, init_dict):
         for key, value in self.__dict__.items():
             if key in init_dict.keys():
@@ -267,6 +213,10 @@ class Index:
         if not self.name:
             return False
         return True
+
+    def get_attribute_by_name(self, name):
+        if name in self.__dict__.keys():
+            return self.__dict__[name]
 
 
 class IndexDetail:
