@@ -194,6 +194,10 @@ class ConstraintDetail:
             self.__dict__ = None
             raise Exception
 
+    def get_attribute_by_name(self, name):
+        if name in self.__dict__.keys():
+            return self.__dict__[name]
+
 
 class Index:
     def __init__(self):
@@ -237,3 +241,7 @@ class IndexDetail:
         for key, value in self.__dict__.items():
             if key in init_dict.keys():
                 self.__dict__[key] = init_dict[key]
+
+    def get_attribute_by_name(self, name):
+        if name in self.__dict__.keys():
+            return self.__dict__[name]

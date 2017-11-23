@@ -183,9 +183,9 @@ class Reader:
 
     def write_to_concole(self):
         pp = pprint.PrettyPrinter(depth=6)
-        pp.pprint(self.tree)
+        # pp.pprint(self.tree)
 
 
-reader = Reader('tasks.xml')
-reader.xml_to_ram()
-reader.write_to_concole()
+# reader = Reader('tasks.xml')
+# reader.xml_to_ram()
+# reader.write_to_concole()

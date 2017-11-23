@@ -3,6 +3,8 @@
 # from xml.dom.minidom import Document
 import re
 
+from metadata import ConstraintDetail
+from metadata import IndexDetail
 from metadata import Constraint
 from metadata import DbdSchema
 from metadata import Domain
@@ -35,6 +37,11 @@ class Writer:
 
     def ram_to_xml(self):
         self.doc = Document()
+        dbd_schema = self.doc.createElement('dbd_schema')
+        self.doc.appendChild(dbd_schema)
+        dbd_schema.appendChild(self.doc.createElement('custom'))
+        dbd_schema.appendChild(self.doc.createElement('domains'))
+        dbd_schema.appendChild(self.doc.createElement('tables'))
         self.prefix_traverse(self.database_schema, self.doc, self.doc)
 
     def write_to_file(self):
@@ -105,51 +112,29 @@ class Writer:
             return ", ".join(bool_array)
         dict_order['props'] = get_bool_attributes()
         dict_order['rname'] = obj.russian_short_name
-        dict_order['domain'] = obj.domain_id.name
-
-    def find_table_obj(self, table_obj):
-        for child_key, child_value in self.database_schema.items():
-            for grandchild_key, grandchild_value in child_value.items():
-                for table, value in grandchild_value['table'].items():
-                    if table is table_obj:
-                        return value
-        raise Exception
-
-    def get_table_dict(self, table_obj):
-        for child_key, child_value in self.database_schema.items():
-            for grandchild_key, grandchild_value in child_value.items():
-                for table_key, table_value in grandchild_value['table'].items():
-                    if table_key is table_obj:
-                        return table_value
-        raise Exception
+        dict_order['domain'] = obj.domain_id
 
     def get_constraint_attributes(self, dict_order, obj):
         def get_bool_attributes():
             bool_array = []
-            if obj.has_value_edit:
+            if obj.constraint_id.has_value_edit:
                 bool_array.append('has_value_edit')
-            if obj.cascading_delete is True:
+            if obj.constraint_id.cascading_delete is True:
                 bool_array.append('full_cascading_delete')
-            if obj.cascading_delete is False:
+            if obj.constraint_id.cascading_delete is False:
                 bool_array.append('cascading_delete')
             if not bool_array:
                 return None
             return ", ".join(bool_array)
 
-        def get_field():
-            for detail in self.get_table_dict(obj.table_id)['constraint_detail']:
-                if detail.constraint_id is obj:
-                    return detail.field_id.name
         dict_order['props'] = get_bool_attributes()
-        dict_order['kind'] = obj.constraint_type
-        dict_order['items'] = get_field()
+        dict_order['kind'] = obj.constraint_id.constraint_type
+        dict_order['items'] = obj.field_id
+        dict_order['reference'] = obj.constraint_id.reference
 
     def get_index_attributes(self, dict_order, obj):
-        def get_items():
-            for detail in self.get_table_dict(obj.table_id)['index_detail']:
-                if detail.index_id is obj:
-                    return detail.field_id.name
-        dict_order['field'] = get_items()
+        dict_order['field'] = obj.field_id
+        dict_order['props'] = obj.index_id.kind
 
     def assembly_attributes(self, obj):
         try:
@@ -160,6 +145,18 @@ class Writer:
             return {key: value for key, value in dict_order.items() if value is not None}
         except Exception as e:
             raise e
+
+    def get_name_by_object(self, obj):
+        if isinstance(obj, (DbdSchema, Domain, Table, Field)):
+            word_list = re.findall('[A-Z][a-z]*', str(type(obj)))
+            tag_name = "_".join([elem.lower() for elem in word_list])
+            return tag_name
+        elif obj in ['domain', 'table']:
+            return obj+'s'
+        elif obj == 'dbd_schema':
+            return obj
+        elif isinstance(obj, (ConstraintDetail, IndexDetail)):
+            return obj.__class__.__name__.replace('Detail', '').lower()
 
     def get_dict_order(self, obj):
         if isinstance(obj, DbdSchema):
@@ -173,6 +170,7 @@ class Writer:
                     'type': None,
                     'align': None,
                     'width': None,
+                    'length': None,
                     'precision': None,
                     'props': None,
                     'char_length': None,
@@ -185,54 +183,37 @@ class Writer:
             return {'name': None,
                     'rname': None,
                     'domain': None,
+                    'description': None,
                     'props': None}
-        elif isinstance(obj, Constraint):
+        elif isinstance(obj, (Constraint, ConstraintDetail)):
             return {'kind': None,
                     'items': None,
                     'reference': None,
                     'props': None}
-        elif isinstance(obj, Index):
+        elif isinstance(obj, (Index, IndexDetail)):
             return {'field': None}
 
-    def is_allowed_type(self, obj):
-        if isinstance(obj, (DbdSchema, Domain, Field, Index, Constraint)):
-            return True
-        elif obj in ['domain', 'table']:
-            return True
-        return False
-
-    def get_name_by_object(self, obj):
-        if isinstance(obj, (DbdSchema, Domain, Table, Field, Index, Constraint)):
-            word_list = re.findall('[A-Z][a-z]*', str(type(obj)))
-            tag_name = "_".join([elem.lower() for elem in word_list])
-            return tag_name
-        elif obj in ['domain', 'table']:
-            return obj+'s'
-        elif obj == 'dbd_schema':
-            return obj
-
-    def tag(self, obj, doc, doc_child):
-        doc_grandchild = doc.createElement(self.get_name_by_object(obj))
-        if not isinstance(obj, str):
+    def create_tag(self, obj):
+        if isinstance(obj, DbdSchema):
             for key, value in self.assembly_attributes(obj).items():
-                doc_grandchild.setAttribute(key, str(value))
-        doc_child.appendChild(doc_grandchild)
-        if isinstance(obj, (DbdSchema, Table)) or obj in ['domain', 'table']:
-            return doc_grandchild
-        else:
-            return doc_child
+                self.doc.getElementsByTagName('dbd_schema')[0].setAttribute(key, value)
+        elif isinstance(obj, (Domain, Table, Field, ConstraintDetail, IndexDetail)):
+            if isinstance(obj, (Domain, Table)):
+                element = self.doc.getElementsByTagName(obj.__class__.__name__.lower()+'s')[0]
+            else:
+                element = self.doc.getElementsByTagName('table')[-1]
+            child_element = self.doc.createElement(self.get_name_by_object(obj))
+            for key, value in self.assembly_attributes(obj).items():
+                child_element.setAttribute(key, value)
+            element.appendChild(child_element)
 
     def prefix_traverse(self, tree, doc, child_doc):
         if isinstance(tree, dict):
             for key, value in tree.items():
                 if value is not None:
-                    if self.is_allowed_type(key):
-                        self.prefix_traverse(value, doc, self.tag(key, doc, child_doc))
-                    elif isinstance(key, Table):
-                        self.prefix_traverse(value, doc, self.tag(key, doc, doc.getElementsByTagName('tables')[0]))
-                    else:
-                        self.prefix_traverse(value, doc, child_doc)
+                    if isinstance(key, (DbdSchema, Table)):
+                        self.create_tag(key)
+                    self.prefix_traverse(value, doc, child_doc)
         elif isinstance(tree, list):
             for element in tree:
-                if self.is_allowed_type(element):
-                    self.tag(element, doc, child_doc)
+                self.create_tag(element)
