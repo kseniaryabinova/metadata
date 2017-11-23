@@ -1,8 +1,9 @@
 from metadata import *
 from xml.dom.minidom import parse, Element
+import pprint
 
 
-class Parser:
+class Reader:
     def __init__(self, filename):
         self.dom = parse(filename)
         self.tree = {}
@@ -139,47 +140,24 @@ class Parser:
         else:
             raise Exception
 
-    def find_field(self, field_list, name):
-        for element in field_list:
-            if element.name == name:
-                return element
-        raise Exception
-
-    def set_detail(self, tree, obj, detail_name):
-        cd = self.get_object_by_name(detail_name+'_detail')
-        cd.set_attributes({'field_id': self.find_field(tree['field'], obj.name),
-                           detail_name+'_id': obj})
-        tree[detail_name+'_detail'].append(cd)
+    def create_detail(self, obj, detail_name):
+        detail = self.get_object_by_name(detail_name+'_detail')
+        detail.set_attributes({'field_id': obj.name, detail_name+'_id': obj})
         obj.name = None
-
-    def get_domain_objects(self):
-        for child_key, child_value in self.tree.items():
-            for grandchild_key, grandchild_value in child_value.items():
-                return grandchild_value['domain']
-
-    def get_last_table(self):
-        for child_key, child_value in self.tree.items():
-            for grandchild_key, grandchild_value in child_value.items():
-                return list(grandchild_value['table'].keys())[-1]
+        return detail
 
     def fill_tree(self, child, tree, obj):
         if child.tagName == 'dbd_schema':
             tree[child.tagName] = {obj: {'domain': [], 'table': {}}}
         elif child.tagName == 'table':
-            tree[child.tagName][obj] = {'field': [],
-                                        'constraint': [],
-                                        'index': [],
-                                        'constraint_detail': [],
-                                        'index_detail': []}
-        elif child.tagName in ['field', 'constraint', 'index', 'domain']:
+            tree[child.tagName][obj] = []
+        elif child.tagName in ['constraint', 'index']:
+            tree.append(self.create_detail(obj, child.tagName))
+        elif child.tagName == 'domain':
             tree[child.tagName].append(obj)
-            if child.tagName == 'field':
-                obj.table_id = self.get_last_table()
-                obj.domain_id = self.find_field(self.get_domain_objects(),
-                                                child.getAttribute('domain'))
-            if child.tagName in ['constraint', 'index']:
-                obj.table_id = self.get_last_table()
-                self.set_detail(tree, obj, child.tagName)
+        elif child.tagName == 'field':
+            obj.domain_id = child.getAttribute('domain')
+            tree.append(obj)
         else:
             raise Exception
         return tree
@@ -203,6 +181,11 @@ class Parser:
         self.tree = {}
         return self.prefix_traverse(self.dom, self.tree)
 
+    def write_to_concole(self):
+        pp = pprint.PrettyPrinter(depth=6)
+        pp.pprint(self.tree)
 
-# pp = pprint.PrettyPrinter(depth=6)
-# pp.pprint(prefix_traverse_xtr(dom, {}))
+
+reader = Reader('tasks.xml')
+reader.xml_to_ram()
+reader.write_to_concole()
