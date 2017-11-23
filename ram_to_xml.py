@@ -1,8 +1,6 @@
 # дедлайн - первые 2 задания до 21 октября
 # 4 задача должна быть выложена до начала декабря
-# from xml.dom.minidom import Document
 import re
-
 from metadata import ConstraintDetail
 from metadata import IndexDetail
 from metadata import Constraint
@@ -11,37 +9,23 @@ from metadata import Domain
 from metadata import Field
 from metadata import Index
 from metadata import Table
-
 from minidom_fixed import Document
-
 from io import StringIO
 
-
-# for el1 in dom.childNodes:
-#     print('\t'+el1.tagName)
-#     for el2 in el1.childNodes:
-#         if type(el2) == Element:
-#             print('\t\t'+el2.tagName)
-#             for el3 in el2.childNodes:
-#                 if type(el3) == Element:
-#                     print('\t\t\t'+el3.tagName)
-#                     for el4 in el3.childNodes:
-#                         if type(el4) == Element:
-#                             print('\t\t\t\t' + el4.tagName)
 
 # сравнение: fc /N tasks.xml filename.xml
 
 class Writer:
     def __init__(self, database_schema):
         self.database_schema = database_schema
-
-    def ram_to_xml(self):
         self.doc = Document()
         dbd_schema = self.doc.createElement('dbd_schema')
         self.doc.appendChild(dbd_schema)
         dbd_schema.appendChild(self.doc.createElement('custom'))
         dbd_schema.appendChild(self.doc.createElement('domains'))
         dbd_schema.appendChild(self.doc.createElement('tables'))
+
+    def ram_to_xml(self):
         self.prefix_traverse(self.database_schema, self.doc, self.doc)
 
     def write_to_file(self):

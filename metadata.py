@@ -1,45 +1,31 @@
-import copy
-# TODO
-# TODO добавить validate, write методы
-# TODO убрать get_attributes
+from abc import ABC, abstractmethod
 
 
-# class AbstractDBObject:
-#     def __init__(self):
-#         pass
-#
-#     def set_attributes(self, attr_dict):
-#         pass
-#
-#     def is_valid(self):
-#         if not self.name:
-#             self.__dict__ = None
-#             raise Exception
-
-
-class DbdSchema:
-    def __init__(self):
-        self.fulltext_engine = None
-        self.version = None
-        self.name = None
-        self.description = None
-
+class AbstractDBObject:
     def set_attributes(self, init_dict):
         for key, value in self.__dict__.items():
             if key in init_dict.keys():
                 self.__dict__[key] = init_dict[key]
-
-    def is_valid(self):
-        if not self.name:
-            return False
-        return True
 
     def get_attribute_by_name(self, name):
         if name in self.__dict__.keys():
             return self.__dict__[name]
 
 
-class Domain:
+class DbdSchema(AbstractDBObject):
+    def __init__(self):
+        self.fulltext_engine = None
+        self.version = None
+        self.name = None
+        self.description = None
+
+    def is_valid(self):
+        if not self.name:
+            return False
+        return True
+
+
+class Domain(AbstractDBObject):
     def __init__(self):
         self.id = None
         self.name = None
@@ -59,22 +45,13 @@ class Domain:
         self.case_sensitive = None
         self.uuid = None
 
-    def set_attributes(self, init_dict):
-        for key, value in self.__dict__.items():
-            if key in init_dict.keys():
-                self.__dict__[key] = init_dict[key]
-
-    def get_attribute_by_name(self, name):
-        if name in self.__dict__.keys():
-            return self.__dict__[name]
-
     def is_valid(self):
         if not self.name:
             return False
         return True
 
 
-class Table:
+class Table(AbstractDBObject):
     def __init__(self):
         self.id = None
         self.schema_id = None
@@ -87,36 +64,13 @@ class Table:
         self.means = None
         self.uuid = None
 
-    def get_attributes(self):
-        dict_order = {'name': None,
-                      'description': None,
-                      'props': None}
-        dict_order.update({k: v for k, v in self.__dict__.items()
-                           if v is not None and v is not True})
-        s = ""
-        for k, v in self.__dict__.items():
-            if v is True:
-                s += k[4:] + ', '
-        if not s == "":
-            dict_order['props'] = s[:-2]
-        return {k: v for k, v in dict_order.items() if v is not None and k[-2:] != "id"}
-
-    def set_attributes(self, init_dict):
-        for key, value in self.__dict__.items():
-            if key in init_dict.keys():
-                self.__dict__[key] = init_dict[key]
-
     def is_valid(self):
         if not self.name:
             return False
         return True
 
-    def get_attribute_by_name(self, name):
-        if name in self.__dict__.keys():
-            return self.__dict__[name]
 
-
-class Field:
+class Field(AbstractDBObject):
     def __init__(self):
         self.id = None
         self.table_id = None
@@ -134,22 +88,13 @@ class Field:
         self.required = None
         self.uuid = None
 
-    def set_attributes(self, init_dict):
-        for key, value in self.__dict__.items():
-            if key in init_dict.keys():
-                self.__dict__[key] = init_dict[key]
-
     def is_valid(self):
         if not self.name:
             return False
         return True
 
-    def get_attribute_by_name(self, name):
-        if name in self.__dict__.keys():
-            return self.__dict__[name]
 
-
-class Constraint:
+class Constraint(AbstractDBObject):
     def __init__(self):
         self.id = None
         self.table_id = None
@@ -162,44 +107,26 @@ class Constraint:
         self.expression = None
         self.uuid = None
 
-    def set_attributes(self, init_dict):
-        for key, value in self.__dict__.items():
-            if key in init_dict.keys():
-                self.__dict__[key] = init_dict[key]
-
     def is_valid(self):
         if not self.constraint_type:
             return False
         return True
 
-    def get_attribute_by_name(self, name):
-        if name in self.__dict__.keys():
-            return self.__dict__[name]
 
-
-class ConstraintDetail:
+class ConstraintDetail(AbstractDBObject):
     def __init__(self):
         self.id = None
         self.constraint_id = None
         self.position = None
         self.field_id = None
 
-    def set_attributes(self, init_dict):
-        for key, value in self.__dict__.items():
-            if key in init_dict.keys():
-                self.__dict__[key] = init_dict[key]
-
     def is_valid(self):
         if not self.constraint_id or not self.field_id:
             self.__dict__ = None
             raise Exception
 
-    def get_attribute_by_name(self, name):
-        if name in self.__dict__.keys():
-            return self.__dict__[name]
 
-
-class Index:
+class Index(AbstractDBObject):
     def __init__(self):
         self.id = None
         self.table_id = None
@@ -208,22 +135,13 @@ class Index:
         self.kind = None
         self.uuid = None
 
-    def set_attributes(self, init_dict):
-        for key, value in self.__dict__.items():
-            if key in init_dict.keys():
-                self.__dict__[key] = init_dict[key]
-
     def is_valid(self):
         if not self.name:
             return False
         return True
 
-    def get_attribute_by_name(self, name):
-        if name in self.__dict__.keys():
-            return self.__dict__[name]
 
-
-class IndexDetail:
+class IndexDetail(AbstractDBObject):
     def __init__(self):
         self.id = None
         self.index_id = None
@@ -236,12 +154,3 @@ class IndexDetail:
         if not self.index_id or not self.field_id:
             self.__dict__ = None
             raise Exception
-
-    def set_attributes(self, init_dict):
-        for key, value in self.__dict__.items():
-            if key in init_dict.keys():
-                self.__dict__[key] = init_dict[key]
-
-    def get_attribute_by_name(self, name):
-        if name in self.__dict__.keys():
-            return self.__dict__[name]

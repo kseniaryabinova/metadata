@@ -1,4 +1,11 @@
-from metadata import *
+from metadata import ConstraintDetail
+from metadata import IndexDetail
+from metadata import Constraint
+from metadata import DbdSchema
+from metadata import Domain
+from metadata import Field
+from metadata import Index
+from metadata import Table
 from xml.dom.minidom import parse, Element
 import pprint
 
@@ -134,7 +141,7 @@ class Reader:
             raise e
 
     def create_object(self, obj, xml_attr, parse_func):
-        obj.set_attributes(parse_func(dict(xml_attr.attributes.items())))
+        obj.set_attributes(parse_func(xml_attr))
         if obj.is_valid():
             return obj
         else:
@@ -168,7 +175,7 @@ class Reader:
                 obj = None
                 if isinstance(child, Element) and child.hasAttributes():
                     obj = self.create_object(self.get_object_by_name(child.tagName),
-                                             child,
+                                             dict(child.attributes.items()),
                                              self.get_parse_func(child.tagName))
                     tree = self.fill_tree(child, tree, obj)
                 if obj is None or not child.hasChildNodes():
@@ -183,9 +190,4 @@ class Reader:
 
     def write_to_concole(self):
         pp = pprint.PrettyPrinter(depth=6)
-        # pp.pprint(self.tree)
-
-
-# reader = Reader('tasks.xml')
-# reader.xml_to_ram()
-# reader.write_to_concole()
+        pp.pprint(self.tree)
