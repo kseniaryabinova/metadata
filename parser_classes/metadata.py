@@ -1,6 +1,3 @@
-from abc import ABC, abstractmethod
-
-
 class AbstractDBObject:
     def set_attributes(self, init_dict):
         for key, value in self.__dict__.items():

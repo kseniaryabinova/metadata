@@ -64,7 +64,8 @@ class DBGenerator:
         for table_key, table_child in self.get_tables().items():
             for index in table_child:
                 if isinstance(index, IndexDetail):
-                    sql.append('CREATE INDEX '+table_key.name+'_'+index.field_id+' ON '+table_key.name+' ('+index.field_id+');')
+                    sql.append('CREATE INDEX '+table_key.name+'_'+index.field_id +
+                               ' ON '+table_key.name+' ('+index.field_id+');')
         return sql
 
     def generate_sql(self):
