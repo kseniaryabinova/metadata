@@ -1,13 +1,13 @@
-from metadata import ConstraintDetail
-from metadata import IndexDetail
-from metadata import Constraint
-from metadata import DbdSchema
-from metadata import Domain
-from metadata import Field
-from metadata import Index
-from metadata import Table
-from xml.dom.minidom import parse, Element
 import pprint
+from xml.dom.minidom import parse, Element
+from parser_classes.metadata import Constraint
+from parser_classes.metadata import ConstraintDetail
+from parser_classes.metadata import DbdSchema
+from parser_classes.metadata import Domain
+from parser_classes.metadata import Field
+from parser_classes.metadata import Index
+from parser_classes.metadata import IndexDetail
+from parser_classes.metadata import Table
 
 
 class Reader:

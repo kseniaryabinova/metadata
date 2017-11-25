@@ -1,16 +1,18 @@
 # дедлайн - первые 2 задания до 21 октября
 # 4 задача должна быть выложена до начала декабря
 import re
-from metadata import ConstraintDetail
-from metadata import IndexDetail
-from metadata import Constraint
-from metadata import DbdSchema
-from metadata import Domain
-from metadata import Field
-from metadata import Index
-from metadata import Table
-from minidom_fixed import Document
 from io import StringIO
+
+from parser_classes.metadata import Constraint
+from parser_classes.metadata import ConstraintDetail
+from parser_classes.metadata import DbdSchema
+from parser_classes.metadata import Domain
+from parser_classes.metadata import Field
+from parser_classes.metadata import Index
+from parser_classes.metadata import IndexDetail
+from parser_classes.metadata import Table
+
+from parser_classes.minidom_fixed import Document
 
 
 # сравнение: fc /N tasks.xml filename.xml
