@@ -2,7 +2,6 @@
 # 4 задача должна быть выложена до начала декабря
 import re
 from io import StringIO
-
 from parser_classes.metadata import Constraint
 from parser_classes.metadata import ConstraintDetail
 from parser_classes.metadata import DbdSchema
@@ -11,9 +10,7 @@ from parser_classes.metadata import Field
 from parser_classes.metadata import Index
 from parser_classes.metadata import IndexDetail
 from parser_classes.metadata import Table
-
 from parser_classes.minidom_fixed import Document
-
 from parser_classes.custom_exception import AssemblyAttributesException
 
 
@@ -46,7 +43,8 @@ class Writer:
     def get_dbd_schema_attributes(self, dict_order, obj):
         pass
 
-    def get_domain_attributes(self, dict_order, obj):
+    @staticmethod
+    def get_domain_attributes(dict_order, obj):
         def get_bool_attributes():
             bool_array = []
             if obj.show_null:
@@ -64,7 +62,8 @@ class Writer:
             return ", ".join(bool_array)
         dict_order['props'] = get_bool_attributes()
 
-    def get_table_attributes(self, dict_order, obj):
+    @staticmethod
+    def get_table_attributes(dict_order, obj):
         def get_bool_attributes():
             bool_array = []
             if obj.can_add:
@@ -78,7 +77,8 @@ class Writer:
             return ", ".join(bool_array)
         dict_order['props'] = get_bool_attributes()
 
-    def get_field_attributes(self, dict_order, obj):
+    @staticmethod
+    def get_field_attributes(dict_order, obj):
         def get_bool_attributes():
             bool_array = []
             if obj.can_input:
@@ -102,7 +102,8 @@ class Writer:
         dict_order['rname'] = obj.russian_short_name
         dict_order['domain'] = obj.domain_id
 
-    def get_constraint_attributes(self, dict_order, obj):
+    @staticmethod
+    def get_constraint_attributes(dict_order, obj):
         def get_bool_attributes():
             bool_array = []
             if obj.constraint_id.has_value_edit:
@@ -120,7 +121,8 @@ class Writer:
         dict_order['items'] = obj.field_id
         dict_order['reference'] = obj.constraint_id.reference
 
-    def get_index_attributes(self, dict_order, obj):
+    @staticmethod
+    def get_index_attributes(dict_order, obj):
         dict_order['field'] = obj.field_id
         dict_order['props'] = obj.index_id.kind
 
@@ -134,7 +136,8 @@ class Writer:
         except Exception as e:
             raise AssemblyAttributesException(e)
 
-    def get_name_by_object(self, obj):
+    @staticmethod
+    def get_name_by_object(obj):
         if isinstance(obj, (DbdSchema, Domain, Table, Field)):
             word_list = re.findall('[A-Z][a-z]*', str(type(obj)))
             tag_name = "_".join([elem.lower() for elem in word_list])
@@ -146,7 +149,8 @@ class Writer:
         elif isinstance(obj, (ConstraintDetail, IndexDetail)):
             return obj.__class__.__name__.replace('Detail', '').lower()
 
-    def get_dict_order(self, obj):
+    @staticmethod
+    def get_dict_order(obj):
         if isinstance(obj, DbdSchema):
             return {'fulltext_engine': None,
                     'version': None,

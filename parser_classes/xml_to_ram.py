@@ -19,14 +19,16 @@ class Reader:
         self.dom = parse(filename)
         self.tree = {}
 
-    def parse_dbd_schema(self, attributes):
+    @staticmethod
+    def parse_dbd_schema(attributes):
         if set(attributes.keys()) <= {'fulltext_engine', 'version',
                                       'name', 'description'}:
             return attributes
         else:
             raise ParseException
 
-    def parse_domain(self, attributes):
+    @staticmethod
+    def parse_domain(attributes):
         if set(attributes.keys()) <= {'name', 'type', 'description', 'data_type_id',
                                       'length', 'char_length', 'precision',
                                       'scale', 'width', 'align', 'props'}:
@@ -51,7 +53,8 @@ class Reader:
         else:
             raise ParseException
 
-    def parse_table(self, attributes):
+    @staticmethod
+    def parse_table(attributes):
         if set(attributes.keys()) <= {'name', 'description', 'temporal_mode',
                                       'means', 'props'}:
             if 'props' in attributes.keys():
@@ -71,7 +74,8 @@ class Reader:
         else:
             raise ParseException
 
-    def parse_field(self, attributes):
+    @staticmethod
+    def parse_field(attributes):
         if set(attributes.keys()) <= {'position', 'name', 'rname',
                                       'description', 'domain', 'props'}:
             def parse_field_props():
@@ -98,7 +102,8 @@ class Reader:
         else:
             raise ParseException
 
-    def parse_constraint(self, attributes):
+    @staticmethod
+    def parse_constraint(attributes):
         if set(attributes.keys()) <= {'name', 'constraint_type', 'reference',
                                       'props', 'expression', 'kind', 'items'}:
             if 'props' in attributes.keys():
@@ -120,7 +125,8 @@ class Reader:
         else:
             raise ParseException
 
-    def parse_index(self, attributes):
+    @staticmethod
+    def parse_index(attributes):
         if set(attributes.keys()) <= {'name', 'props', 'kind', 'field'}:
             if 'props' in attributes.keys():
                 def parse_index_props():
@@ -138,13 +144,15 @@ class Reader:
         except Exception as e:
             raise GetParseFuncException(e)
 
-    def get_object_by_name(self, obj_name):
+    @staticmethod
+    def get_object_by_name(obj_name):
         try:
             return globals()[obj_name.title().replace("_", "")]()
         except Exception as e:
             raise GetParseFuncException(e)
 
-    def create_object(self, obj, xml_attr, parse_func):
+    @staticmethod
+    def create_object(obj, xml_attr, parse_func):
         obj.set_attributes(parse_func(xml_attr))
         if obj.is_valid():
             return obj

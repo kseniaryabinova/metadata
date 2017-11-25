@@ -37,16 +37,16 @@ class DBGenerator:
 
     def generate_field(self, field):
         domain = self.find_field(self.get_domains(), field.domain_id).type
-        type = ''
+        domain_type = ''
         if domain in ['STRING', 'MEMO']:
-            type = 'TEXT'
+            domain_type = 'TEXT'
         elif domain in ['LARGEINT', 'WORD', 'BOOLEAN', 'TIME', 'DATE', 'BYTE', 'SMALLINT']:
-            type = 'INTEGER'
+            domain_type = 'INTEGER'
         elif domain == 'BLOB':
-            type = 'BLOB'
+            domain_type = 'BLOB'
         elif domain in ['FLOAT', 'CODE']:
-            type = 'REAL'
-        return field.name+' '+type
+            domain_type = 'REAL'
+        return field.name+' '+domain_type
 
     def generate_primary_key(self, table_attr):
         for constraint in table_attr:
