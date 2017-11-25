@@ -8,6 +8,10 @@ from parser_classes.metadata import Field
 from parser_classes.metadata import Index
 from parser_classes.metadata import IndexDetail
 from parser_classes.metadata import Table
+from parser_classes.custom_exception import ParseException
+from parser_classes.custom_exception import GetParseFuncException
+from parser_classes.custom_exception import CreateObjectException
+from parser_classes.custom_exception import FillTreeException
 
 
 class Reader:
@@ -20,7 +24,7 @@ class Reader:
                                       'name', 'description'}:
             return attributes
         else:
-            raise Exception
+            raise ParseException
 
     def parse_domain(self, attributes):
         if set(attributes.keys()) <= {'name', 'type', 'description', 'data_type_id',
@@ -45,7 +49,7 @@ class Reader:
                 attributes.update(parse_domain_props())
             return attributes
         else:
-            raise Exception
+            raise ParseException
 
     def parse_table(self, attributes):
         if set(attributes.keys()) <= {'name', 'description', 'temporal_mode',
@@ -65,7 +69,7 @@ class Reader:
                 attributes.update(parse_table_props())
             return attributes
         else:
-            raise Exception
+            raise ParseException
 
     def parse_field(self, attributes):
         if set(attributes.keys()) <= {'position', 'name', 'rname',
@@ -92,7 +96,7 @@ class Reader:
             attributes['russian_short_name'] = attributes.pop('rname')
             return attributes
         else:
-            raise Exception
+            raise ParseException
 
     def parse_constraint(self, attributes):
         if set(attributes.keys()) <= {'name', 'constraint_type', 'reference',
@@ -114,7 +118,7 @@ class Reader:
             attributes['name'] = attributes.pop('items')
             return attributes
         else:
-            raise Exception
+            raise ParseException
 
     def parse_index(self, attributes):
         if set(attributes.keys()) <= {'name', 'props', 'kind', 'field'}:
@@ -126,26 +130,26 @@ class Reader:
             attributes['name'] = attributes.pop('field')
             return attributes
         else:
-            raise Exception
+            raise ParseException
 
     def get_parse_func(self, node_name):
         try:
             return getattr(self, 'parse_' + node_name)
         except Exception as e:
-            raise e
+            raise GetParseFuncException(e)
 
     def get_object_by_name(self, obj_name):
         try:
             return globals()[obj_name.title().replace("_", "")]()
         except Exception as e:
-            raise e
+            raise GetParseFuncException(e)
 
     def create_object(self, obj, xml_attr, parse_func):
         obj.set_attributes(parse_func(xml_attr))
         if obj.is_valid():
             return obj
         else:
-            raise Exception
+            raise CreateObjectException
 
     def create_detail(self, obj, detail_name):
         detail = self.get_object_by_name(detail_name+'_detail')
@@ -166,7 +170,7 @@ class Reader:
             obj.domain_id = child.getAttribute('domain')
             tree.append(obj)
         else:
-            raise Exception
+            raise FillTreeException
         return tree
 
     def prefix_traverse(self, node, tree):

@@ -14,6 +14,8 @@ from parser_classes.metadata import Table
 
 from parser_classes.minidom_fixed import Document
 
+from parser_classes.custom_exception import AssemblyAttributesException
+
 
 # сравнение: fc /N tasks.xml filename.xml
 
@@ -130,7 +132,7 @@ class Writer:
             getattr(self, 'get_'+self.get_name_by_object(obj)+'_attributes')(dict_order, obj)
             return {key: value for key, value in dict_order.items() if value is not None}
         except Exception as e:
-            raise e
+            raise AssemblyAttributesException(e)
 
     def get_name_by_object(self, obj):
         if isinstance(obj, (DbdSchema, Domain, Table, Field)):

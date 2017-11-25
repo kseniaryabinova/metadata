@@ -1,8 +1,26 @@
 class DBException(Exception):
-    def __init__(self, message):
-        Exception.__init__(self, "redundant attribute in {}".format(message))
+    pass
 
 
 class KeyException(Exception):
-    def __init__(self, message):
-        Exception.__init__(self, "error in attributes: {} was expected".format(message))
+    pass
+
+
+class ParseException(Exception):
+    pass
+
+
+class GetParseFuncException(Exception):
+    pass
+
+
+class CreateObjectException(Exception):
+    pass
+
+
+class FillTreeException(Exception):
+    pass
+
+
+class AssemblyAttributesException(Exception):
+    pass
