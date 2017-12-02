@@ -7,7 +7,7 @@ import re
 import copy
 
 
-class DBGenerator:
+class Postgres:
     def __init__(self, database_schema):
         self.database_schema = database_schema
         self.query = Query()
@@ -190,5 +190,5 @@ class Query:
 
 
 reader = Reader('O:/progas/python/metadata/tasks.xml')
-gen = DBGenerator(reader.xml_to_ram())
-gen.execute()
+generator = Postgres(reader.xml_to_ram())
+generator.execute()
