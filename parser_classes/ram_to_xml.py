@@ -11,8 +11,10 @@ from parser_classes.metadata import Index
 from parser_classes.metadata import IndexDetail
 from parser_classes.metadata import Table
 from parser_classes.minidom_fixed import Document
-from parser_classes.custom_exception import AssemblyAttributesException
 
+
+class AssemblyAttributesException(Exception):
+    pass
 
 # сравнение: fc /N tasks.xml filename.xml
 

@@ -8,10 +8,22 @@ from parser_classes.metadata import Field
 from parser_classes.metadata import Index
 from parser_classes.metadata import IndexDetail
 from parser_classes.metadata import Table
-from parser_classes.custom_exception import ParseException
-from parser_classes.custom_exception import GetParseFuncException
-from parser_classes.custom_exception import CreateObjectException
-from parser_classes.custom_exception import FillTreeException
+
+
+class ParseException(Exception):
+    pass
+
+
+class GetParseFuncException(Exception):
+    pass
+
+
+class CreateObjectException(Exception):
+    pass
+
+
+class FillTreeException(Exception):
+    pass
 
 
 class Reader:
