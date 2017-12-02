@@ -22,7 +22,7 @@
     <domain name="id_CONT_C" description="Первичный ключ таблицы CONT_CTG" type="LARGEINT" align="L" width="11"/>
     <domain name="id_CONT_T" description="Первичный ключ таблицы CONT_TIP" type="LARGEINT" align="L" width="11"/>
     <domain name="id_DEPEND" description="Первичный ключ таблицы DEPENDEN" type="LARGEINT" align="L" width="11"/>
-    <domain name="id_DETAILS" description="Первичный ключ таблицы DETAILS" type="LARGEINT" align="L" width="11"/>
+    <domain name="id_DETAILS" description="Первичный dateключ таблицы DETAILS" type="LARGEINT" align="L" width="11"/>
     <domain name="id_GRTASKS" description="Первичный ключ таблицы GRTASKS" type="LARGEINT" align="L" width="11"/>
     <domain name="id_INST_C" description="Первичный ключ таблицы INST_CON" type="LARGEINT" align="L" width="11"/>
     <domain name="id_LC_TEAC" description="Первичный ключ таблицы LC_TEACH" type="LARGEINT" align="L" width="11"/>

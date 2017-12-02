@@ -1,6 +1,6 @@
 class AbstractDBObject:
     def set_attributes(self, init_dict):
-        for key, value in self.__dict__.items():
+        for key in self.__dict__.keys():
             if key in init_dict.keys():
                 self.__dict__[key] = init_dict[key]
 
