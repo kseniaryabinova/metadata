@@ -96,19 +96,18 @@ class Postgres:
             new_name = self.replace_all(domain.name, {' ': '_', '.': '', '\\': '', '-': '_', '/': '_'})
             return new_name
 
-    def generate_domain(self, domain):
-        sql = 'CREATE DOMAIN {} '.format(self.get_domain_name(domain))
-        domain_type = self.get_domain_type(domain.type)
-        if domain.type == 'STRING':
-            domain_type += '({})'.format(domain.char_length)
-        sql += 'AS {} ;'.format(domain_type)
-        domain.description = self.get_domain_name(domain)
-        return sql
-
     def generate_domains(self):
+        def generate_domain(domain_obj):
+            sql = 'CREATE DOMAIN {} '.format(self.get_domain_name(domain_obj))
+            domain_type = self.get_domain_type(domain_obj.type)
+            if domain.type == 'STRING':
+                domain_type += '({})'.format(domain_obj.char_length)
+            sql += 'AS {} ;'.format(domain_type)
+            domain.description = self.get_domain_name(domain_obj)
+            return sql
         domains = []
         for domain in self.get_domains():
-            domains.append(self.generate_domain(domain))
+            domains.append(generate_domain(domain))
         return domains
 
     def generate_primary_key(self, table_attr):
@@ -121,23 +120,23 @@ class Postgres:
         else:
             return ', PRIMARY KEY ({})'.format(', '.join(fields))
 
-    def generate_foreign_key(self, table, table_attr):
-        fields = []
-        for const in table_attr:
-            if isinstance(const, ConstraintDetail) and const.constraint_id.constraint_type == 'FOREIGN':
-                sql = 'alter table {} ' \
-                      'add constraint fk_{} ' \
-                      'foreign key ({}) ' \
-                      'REFERENCES {} ({}); '.format(table.name, const.constraint_id.reference + '_' + const.field_id,
-                                                    const.field_id, const.constraint_id.reference,
-                                                    self.get_primary_keys(const.constraint_id.reference))
-                fields.append(sql)
-        return fields
-
     def generate_foreign_keys(self):
+        def generate_foreign_key(table, table_attr):
+            fields = []
+            for const in table_attr:
+                if isinstance(const, ConstraintDetail) and const.constraint_id.constraint_type == 'FOREIGN':
+                    sql = 'alter table {} ' \
+                          'add constraint fk_{} ' \
+                          'foreign key ({}) ' \
+                          'REFERENCES {} ({}); '.format(table.name,
+                                                        const.constraint_id.reference + '_' + const.field_id,
+                                                        const.field_id, const.constraint_id.reference,
+                                                        self.get_primary_keys(const.constraint_id.reference))
+                    fields.append(sql)
+            return fields
         fks = []
         for table_name, attr_dict in self.get_tables().items():
-            fks += self.generate_foreign_key(table_name, attr_dict)
+            fks += generate_foreign_key(table_name, attr_dict)
         return fks
 
     def generate_indexes(self):
@@ -162,7 +161,7 @@ class Postgres:
             self.query.execute(foreign_key)
         self.query.execute('commit')
 
-    def execute(self):
+    def generate(self):
         self.generate_sql()
 
 
@@ -191,4 +190,4 @@ class Query:
 
 reader = Reader('O:/progas/python/metadata/tasks.xml')
 generator = Postgres(reader.xml_to_ram())
-generator.execute()
+generator.generate()

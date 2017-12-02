@@ -3,7 +3,7 @@ import sqlite3
 
 class SQLite:
     def __init__(self):
-        pass
+        sql = open('O:/progas/python/metadata/database_classes/dbd_const.py', 'r').read()
 
 
 class Query:
@@ -20,3 +20,6 @@ class Query:
 
     def fetchall(self):
         return self.cursor.fetchall()
+
+
+generator = SQLite()
