@@ -61,6 +61,7 @@ class Reader:
                     return props_dict
 
                 attributes.update(parse_domain_props())
+            attributes['data_type_id'] = attributes.pop('type')
             return attributes
         else:
             raise ParseException

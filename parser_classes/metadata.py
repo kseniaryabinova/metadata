@@ -4,6 +4,9 @@ class AbstractDBObject:
             if key in init_dict.keys():
                 self.__dict__[key] = init_dict[key]
 
+    def get_attributes(self):
+        return self.__dict__
+
     def get_attribute_by_name(self, name):
         if name in self.__dict__.keys():
             return self.__dict__[name]
@@ -27,7 +30,6 @@ class Domain(AbstractDBObject):
         self.id = None
         self.name = None
         self.description = None
-        self.type = None
         self.data_type_id = None
         self.length = None
         self.char_length = None

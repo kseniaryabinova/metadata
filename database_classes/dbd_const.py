@@ -7,14 +7,17 @@ CURRENT_DBD_VERSION = '3.1'
 SQL_DBD_PRE_INIT = """\
 pragma foreign_keys = on;
 
-begin transaction;
+--begin transaction;
 
 --
 -- Каталог схем для таблиц
 --
 create table dbd$schemas (
     id integer primary key autoincrement not null,
-    name varchar not null -- имя схемы
+    name varchar not null, -- имя схемы
+    fulltext_engine varchar default(null),
+    version varchar default(null),
+    description varchar default(null)
 );
 """
 
@@ -38,11 +41,12 @@ create table dbd$domains (
     thousands_separator boolean default(null),  -- нужен ли разделитель тысяч?
     summable boolean default(null),             -- признак того, что поле является суммируемым
     case_sensitive boolean default(null),       -- признак необходимости регистронезависимого поиска для поля
-    uuid varchar unique not null COLLATE NOCASE -- уникальный идентификатор домена
+--    uuid varchar unique not null COLLATE NOCASE, -- уникальный идентификатор домена
+    FOREIGN KEY(data_type_id) REFERENCES dbd$data_types(id)
 );
 
 create index "idx.FZX832TFV" on dbd$domains(data_type_id);
-create index "idx.4AF9IY0XR" on dbd$domains(uuid);
+--create index "idx.4AF9IY0XR" on dbd$domains(uuid);
 """
 
 SQL_DBD_TABLES_TABLE_INIT = """
@@ -58,12 +62,12 @@ create table dbd$tables (
     can_edit boolean default(null),       -- разрешено ли редактирование  таблице?
     can_delete boolean default(null),     -- разрешено ли удаление в таблице
     temporal_mode varchar default(null),  -- временная таблица или нет? Если временная, то какого типа?
-    means varchar default(null),          -- шаблон описания записи таблицы
-    uuid varchar unique not null COLLATE NOCASE  -- уникальный идентификатор таблицы
+    means varchar default(null)          -- шаблон описания записи таблицы
+--    uuid varchar unique not null COLLATE NOCASE  -- уникальный идентификатор таблицы
 );
 
 create index "idx.GCOFIBEBJ" on dbd$tables(name);
-create index "idx.2J02T9LQ7" on dbd$tables(uuid);
+--create index "idx.2J02T9LQ7" on dbd$tables(uuid);
 """
 
 SQL_DBD_TABLES_INIT = """
@@ -73,7 +77,7 @@ SQL_DBD_TABLES_INIT = """
 create table dbd$fields (
     id integer primary key autoincrement default(null),
     table_id integer not null,             -- идентификатор таблицы (dbd$tables)
-    position integer not null,             -- номер поля в таблице (для упорядочивания полей)
+--    position integer not null,             -- номер поля в таблице (для упорядочивания полей)
     name varchar not null,                 -- латинское имя поля (будет использовано в схеме Oracle)
     russian_short_name varchar not null,   -- русское имя поля для отображения пользователю в интерактивных режимах
     description varchar default(null),     -- описание
@@ -85,14 +89,15 @@ create table dbd$fields (
     is_mean boolean default(null),         -- является ли поле элементом описания записи таблицы?
     autocalculated boolean default(null),  -- признак того, что значение в поле вычисляется программным кодом
     required boolean default(null),        -- признак того, что поле дорлжно быть заполнено
-    uuid varchar unique not null COLLATE NOCASE -- уникальный идентификатор поля
+--    uuid varchar unique not null COLLATE NOCASE, -- уникальный идентификатор поля
+    FOREIGN KEY(table_id) REFERENCES dbd$tables(id)
 );
 
 create index "idx.7UAKR6FT7" on dbd$fields(table_id);
-create index "idx.7HJ6KZXJF" on dbd$fields(position);
+--create index "idx.7HJ6KZXJF" on dbd$fields(position);
 create index "idx.74RSETF9N" on dbd$fields(name);
 create index "idx.6S0E8MWZV" on dbd$fields(domain_id);
-create index "idx.88KWRBHA7" on dbd$fields(uuid);
+--create index "idx.88KWRBHA7" on dbd$fields(uuid);
 
 --
 -- Спец. настройки описателя
@@ -116,7 +121,8 @@ create table dbd$constraints (
     has_value_edit boolean default(null),   -- признак наличия поля ввода ключа
     cascading_delete boolean default(null), -- признак каскадного удаления для внешнего ключа
     expression varchar default(null),       -- выражение для контрольного ограничения
-    uuid varchar unique not null COLLATE NOCASE -- уникальный идентификатор ограничения
+--    uuid varchar unique not null COLLATE NOCASE, -- уникальный идентификатор ограничения
+    FOREIGN KEY(table_id) REFERENCES dbd$tables(id)
 );
 
 create index "idx.6F902GEQ3" on dbd$constraints(table_id);
@@ -124,7 +130,7 @@ create index "idx.6SRYJ35AJ" on dbd$constraints(name);
 create index "idx.62HLW9WGB" on dbd$constraints(constraint_type);
 create index "idx.5PQ7Q3E6J" on dbd$constraints(reference);
 create index "idx.92GH38TZ4" on dbd$constraints(unique_key_id);
-create index "idx.6IOUMJINZ" on dbd$constraints(uuid);
+--create index "idx.6IOUMJINZ" on dbd$constraints(uuid);
 
 --
 -- Детали ограничений
@@ -132,12 +138,14 @@ create index "idx.6IOUMJINZ" on dbd$constraints(uuid);
 create table dbd$constraint_details (
     id integer primary key autoincrement default(null),
     constraint_id integer not null,          -- идентификатор ограничения (dbd$constraints)
-    position integer not null,               -- номер элемента ограничения
-    field_id integer not null default(null)  -- идентификатор поля (dbd$fields) в таблице, для которой определено ограничение
+--    position integer not null,               -- номер элемента ограничения
+    field_id integer not null default(null),  -- идентификатор поля (dbd$fields) в таблице, для которой определено ограничение
+    FOREIGN KEY(field_id) REFERENCES dbd$fields(id),
+    FOREIGN KEY(constraint_id) REFERENCES dbd$constraints(id)
 );
 
 create index "idx.5CYTJWVWR" on dbd$constraint_details(constraint_id);
-create index "idx.507FDQDMZ" on dbd$constraint_details(position);
+--create index "idx.507FDQDMZ" on dbd$constraint_details(position);
 create index "idx.4NG17JVD7" on dbd$constraint_details(field_id);
 
 --
@@ -149,12 +157,13 @@ create table dbd$indices (
     name varchar default(null),                         -- имя индекса
     local boolean default(0),                           -- показывает тип индекса: локальный или глобальный
     kind char default(null),                            -- вид индекса (простой/уникальный/полнотекстовый)
-    uuid varchar unique not null COLLATE NOCASE         -- уникальный идентификатор индекса
+--    uuid varchar unique not null COLLATE NOCASE,         -- уникальный идентификатор индекса
+    FOREIGN KEY(table_id) REFERENCES dbd$tables(id)
 );
 
 create index "idx.12XXTJUYZ" on dbd$indices(table_id);
 create index "idx.6G0KCWN0R" on dbd$indices(name);
-create index "idx.FQH338PQ7" on dbd$indices(uuid);
+--create index "idx.FQH338PQ7" on dbd$indices(uuid);
 
 --
 -- Детали индексов
@@ -162,10 +171,12 @@ create index "idx.FQH338PQ7" on dbd$indices(uuid);
 create table dbd$index_details (
     id integer primary key autoincrement default(null),
     index_id integer not null,                          -- идентификатор индекса (dbd$indices)
-    position integer not null,                          -- порядковый номер элемента индекса
+--    position integer not null,                          -- порядковый номер элемента индекса
     field_id integer default(null),                     -- идентификатор поля (dbd$fields), участвующего в индексе
     expression varchar default(null),                   -- выражение для индекса
-    descend boolean default(null)                       -- направление сортировки
+    descend boolean default(null),                       -- направление сортировки
+    FOREIGN KEY(field_id) REFERENCES dbd$fields(id),
+    FOREIGN KEY(index_id) REFERENCES dbd$indices(id)
 );
 
 create index "idx.H1KFOWTCB" on dbd$index_details(index_id);
@@ -218,7 +229,7 @@ create view dbd$view_fields as
 select
   dbd$schemas.name "schema",
   dbd$tables.name "table",
-  dbd$fields.position "position",
+--  dbd$fields.position "position",
   dbd$fields.name "name",
   dbd$fields.russian_short_name "russian_short_name",
   dbd$fields.description "description",
@@ -247,8 +258,8 @@ from dbd$fields
   inner join dbd$data_types on dbd$domains.data_type_id = dbd$data_types.id
   Left Join dbd$schemas On dbd$tables.schema_id = dbd$schemas.id
 order by
-  dbd$tables.name,
-  dbd$fields.position;
+  dbd$tables.name;
+--  dbd$fields.position;
 
 create view dbd$view_domains as
 select
@@ -275,7 +286,7 @@ create view dbd$view_constraints as
 select
   dbd$constraints.id "constraint_id",
   dbd$constraints.constraint_type "constraint_type",
-  dbd$constraint_details.position "position",
+--  dbd$constraint_details.position "position",
   dbd$schemas.name "schema",
   dbd$tables.name "table_name",
   dbd$fields.name "field_name",
@@ -288,7 +299,8 @@ from
   left join dbd$fields on dbd$constraint_details.field_id = dbd$fields.id
   Left Join dbd$schemas On dbd$tables.schema_id = dbd$schemas.id
 order by
-  constraint_id, position;
+  constraint_id;
+   -- position;
 
 create view dbd$view_indices as
 select
@@ -298,7 +310,7 @@ select
   dbd$tables.name as table_name,
   dbd$indices.local,
   dbd$indices.kind,
-  dbd$index_details.position,
+--  dbd$index_details.position,
   dbd$fields.name as field_name,
   dbd$index_details.expression,
   dbd$index_details.descend
@@ -309,7 +321,8 @@ from
   left join dbd$fields on dbd$index_details.field_id = dbd$fields.id
   Left Join dbd$schemas On dbd$tables.schema_id = dbd$schemas.id
 order by
-  dbd$tables.name, dbd$indices.name, dbd$index_details.position;
+  dbd$tables.name, dbd$indices.name;
+   --dbd$index_details.position;
 """
 
 COMMIT = """
@@ -318,4 +331,4 @@ commit;
 
 SQL_DBD_Init = SQL_DBD_PRE_INIT + SQL_DBD_DOMAINS_TABLE_INIT + \
     SQL_DBD_TABLES_TABLE_INIT + SQL_DBD_TABLES_INIT + \
-    SQL_DBD_VIEWS_INIT + COMMIT
+    SQL_DBD_VIEWS_INIT# + COMMIT

@@ -63,6 +63,7 @@ class Writer:
                 return None
             return ", ".join(bool_array)
         dict_order['props'] = get_bool_attributes()
+        dict_order['type'] = obj.data_type_id
 
     @staticmethod
     def get_table_attributes(dict_order, obj):
