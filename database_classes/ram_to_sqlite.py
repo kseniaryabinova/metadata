@@ -6,13 +6,12 @@ from parser_classes.xml_to_ram import Reader
 from parser_classes.metadata import ConstraintDetail
 from parser_classes.metadata import IndexDetail
 from parser_classes.metadata import Field
-
 from parser_classes.metadata import DbdSchema
 from parser_classes.metadata import Domain
 from parser_classes.metadata import Table
 
 
-class SQLite:
+class RAMtoSQLite:
     def __init__(self, db_schema):
         self.query = Query()
         self.query.executescript(SQL_DBD_Init)
@@ -27,30 +26,6 @@ class SQLite:
                         element.constraint_id.table_id = table.name
         self.db_schema = db_schema
 
-    def get_domains(self):
-        for child_key, child_value in self.db_schema['dbd_schema'].items():
-            return child_value['domain']
-
-    def get_tables(self):
-        for child_key, child_value in self.db_schema['dbd_schema'].items():
-            return list(child_value['table'].keys())
-
-    def get_schemas(self):
-        for child_key, child_value in self.db_schema['dbd_schema'].items():
-            return [child_key]
-
-    def get_fields(self):
-        for child_key, child_value in self.db_schema['dbd_schema'].items():
-            return [item for sublist in list(child_value['table'].values()) for item in sublist if isinstance(item, Field)]
-
-    def get_constraints(self):
-        for child_key, child_value in self.db_schema['dbd_schema'].items():
-            return [item for sublist in list(child_value['table'].values()) for item in sublist if isinstance(item, IndexDetail)]
-
-    def get_indexes(self):
-        for child_key, child_value in self.db_schema['dbd_schema'].items():
-            return [item for sublist in list(child_value['table'].values()) for item in sublist if isinstance(item, ConstraintDetail)]
-
     def get_id(self, table, column_name, column_value):
         if column_name == 'data_type_id':
             self.query.execute('SELECT id FROM dbd$data_types WHERE type_id=\'{}\''.format(column_value))
@@ -62,7 +37,7 @@ class SQLite:
             self.query.execute('SELECT id FROM {} WHERE {}=\'{}\''.format(table, column_name, column_value))
         return self.query.fetchall()[0][0]
 
-    def get_proper_value(self, table_name, column_name, column_value):
+    def get_value_form(self, table_name, column_name, column_value):
         def get_column_type():
             self.query.execute('PRAGMA table_info({});'.format(table_name))
             for column in self.query.fetchall():
@@ -91,7 +66,7 @@ class SQLite:
             for key, value in obj.index_id.get_attributes().items():
                 if value is not None:
                     columns.append(key)
-                    values.append(self.get_proper_value('dbd$indices', key, value))
+                    values.append(self.get_value_form('dbd$indices', key, value))
             index_sql = 'INSERT INTO dbd$indices ({}) VALUES ({})'.format(', '.join(map(str, columns)),
                                                                           ', '.join(map(str, values)))
             self.query.execute(index_sql)
@@ -109,7 +84,7 @@ class SQLite:
             for key, value in obj.constraint_id.get_attributes().items():
                 if value is not None:
                     columns.append(key)
-                    values.append(self.get_proper_value('dbd$constraints', key, value))
+                    values.append(self.get_value_form('dbd$constraints', key, value))
             const_sql = 'INSERT INTO dbd$constraints ({}) VALUES ({})'.format(', '.join(map(str, columns)),
                                                                               ', '.join(map(str, values)))
             self.query.execute(const_sql)
@@ -127,7 +102,7 @@ class SQLite:
             for key, value in obj.get_attributes().items():
                 if value is not None:
                     columns.append(key)
-                    values.append(self.get_proper_value(table_name, key, value))
+                    values.append(self.get_value_form(table_name, key, value))
             return 'INSERT INTO {} ({}) VALUES ({})'.format(table_name,
                                                             ', '.join(map(str, columns)),
                                                             ', '.join(map(str, values)))
@@ -153,6 +128,30 @@ class SQLite:
             if isinstance(element, (DbdSchema, Domain, Table, Field)):
                 domains.append(self.generate_record(element, get_table_name(element)))
         return domains
+
+    def get_domains(self):
+        for child_key, child_value in self.db_schema['dbd_schema'].items():
+            return child_value['domain']
+
+    def get_tables(self):
+        for child_key, child_value in self.db_schema['dbd_schema'].items():
+            return list(child_value['table'].keys())
+
+    def get_schemas(self):
+        for child_key, child_value in self.db_schema['dbd_schema'].items():
+            return [child_key]
+
+    def get_fields(self):
+        for child_key, child_value in self.db_schema['dbd_schema'].items():
+            return [item for sublist in list(child_value['table'].values()) for item in sublist if isinstance(item, Field)]
+
+    def get_constraints(self):
+        for child_key, child_value in self.db_schema['dbd_schema'].items():
+            return [item for sublist in list(child_value['table'].values()) for item in sublist if isinstance(item, IndexDetail)]
+
+    def get_indexes(self):
+        for child_key, child_value in self.db_schema['dbd_schema'].items():
+            return [item for sublist in list(child_value['table'].values()) for item in sublist if isinstance(item, ConstraintDetail)]
 
     def generate(self):
         for element in self._generate(self.get_schemas()):
@@ -198,5 +197,5 @@ class Query:
 
 
 reader = Reader('O:/progas/python/metadata/tasks.xml')
-generator = SQLite(reader.xml_to_ram())
+generator = RAMtoSQLite(reader.xml_to_ram())
 generator.generate()
