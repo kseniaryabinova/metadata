@@ -2,7 +2,6 @@ import sqlite3
 import contextlib
 import os
 from database_classes.dbd_const import SQL_DBD_Init
-from parser_classes.xml_to_ram import Reader
 from parser_classes.metadata import ConstraintDetail
 from parser_classes.metadata import IndexDetail
 from parser_classes.metadata import Field
@@ -27,17 +26,6 @@ class RAMtoSQLite:
                         element.constraint_id.table_id = table.name
         self.db_schema = db_schema
 
-    def get_id(self, table, column_name, column_value):
-        if column_name == 'data_type_id':
-            self.query.execute('SELECT id FROM dbd$data_types WHERE type_id=\'{}\''.format(column_value))
-        elif column_name in ['table_id', 'reference']:
-            self.query.execute('SELECT id FROM dbd$tables WHERE name=\'{}\''.format(column_value))
-        elif column_name == 'domain_id':
-            self.query.execute('SELECT id FROM dbd$domains WHERE name=\'{}\''.format(column_value))
-        else:
-            self.query.execute('SELECT id FROM {} WHERE {}=\'{}\''.format(table, column_name, column_value))
-        return self.query.fetchall()[0][0]
-
     def get_value_form(self, table_name, column_name, column_value):
         def get_column_type():
             self.query.execute('PRAGMA table_info({});'.format(table_name))
@@ -48,9 +36,8 @@ class RAMtoSQLite:
         column_type = get_column_type()
         if column_type == 'integer':
             if column_name in ['table_id', 'reference', 'domain_id', 'data_type_id']:
-                return 1
-                # return int(self.get_id(table_name, column_name, column_value))
-            if column_name == 'schema_id':
+                return 0
+            elif column_name == 'schema_id':
                 return 1
             return int(column_value)
         elif column_type in ['varchar', 'char']:
@@ -60,42 +47,6 @@ class RAMtoSQLite:
                 return 1
             else:
                 return 0
-
-    def generate_index(self, obj):
-        try:
-            columns = []
-            values = []
-            for key, value in obj.index_id.get_attributes().items():
-                if value is not None:
-                    columns.append(key)
-                    values.append(self.get_value_form('dbd$indices', key, value))
-            index_sql = 'INSERT INTO dbd$indices ({}) VALUES ({})'.format(', '.join(map(str, columns)),
-                                                                          ', '.join(map(str, values)))
-            self.query.execute(index_sql)
-            self.query.execute('select id from dbd$indices order by id desc limit 1')
-            return 'INSERT INTO dbd$index_details (index_id, field_id) VALUES ({}, {})'.format(
-                self.query.fetchall()[0][0],
-                self.get_id('dbd$fields', 'name', obj.field_id))
-        except Exception as e:
-            raise e
-
-    def generate_constraint(self, obj):
-        try:
-            columns = []
-            values = []
-            for key, value in obj.constraint_id.get_attributes().items():
-                if value is not None:
-                    columns.append(key)
-                    values.append(self.get_value_form('dbd$constraints', key, value))
-            const_sql = 'INSERT INTO dbd$constraints ({}) VALUES ({})'.format(', '.join(map(str, columns)),
-                                                                              ', '.join(map(str, values)))
-            self.query.execute(const_sql)
-            self.query.execute('select id from dbd$constraints order by id desc limit 1')
-            return 'INSERT INTO dbd$constraint_details (constraint_id, field_id) VALUES ({}, {})'.format(
-                self.query.fetchall()[0][0],
-                self.get_id('dbd$fields', 'name', obj.field_id))
-        except Exception as e:
-            raise e
 
     def generate_record(self, obj, table_name):
         try:
@@ -109,22 +60,20 @@ class RAMtoSQLite:
         except Exception as e:
             raise e
 
-    @staticmethod
-    def get_object(obj):
-        if isinstance(obj, ConstraintDetail):
-            return obj.constraint_id
-        elif isinstance(obj, IndexDetail):
-            return obj.index_id
-        else:
-            return obj
+    def _generate_record(self, list_attr):
+        def get_object(obj):
+            if isinstance(obj, ConstraintDetail):
+                return obj.constraint_id
+            elif isinstance(obj, IndexDetail):
+                return obj.index_id
+            else:
+                return obj
 
-    @staticmethod
-    def form_insert_query(obj, table_name, values):
-        records = ', '.join(values)
-        column_names = ', '.join(list(obj.get_attributes().keys()))
-        return 'insert into {} ({}) VALUES {}'.format(table_name, column_names, records)
+        def form_insert_query(obj, table_name, values):
+            records = ', '.join(values)
+            column_names = ', '.join(list(obj.get_attributes().keys()))
+            return 'insert into {} ({}) VALUES {}'.format(table_name, column_names, records)
 
-    def _generate_obj_in_db(self, list_attr):
         def get_table_name(obj):
             if isinstance(obj, Field):
                 return 'dbd$fields'
@@ -138,11 +87,12 @@ class RAMtoSQLite:
                 return 'dbd$constraints'
             if isinstance(element, IndexDetail):
                 return 'dbd$indices'
+
         elements = []
         for element in list_attr:
-            elements.append(self.generate_record(self.get_object(element), get_table_name(element)))
-        query = self.form_insert_query(self.get_object(list_attr[0]), get_table_name(list_attr[0]), elements)
-        return query
+            elements.append(self.generate_record(get_object(element), get_table_name(element)))
+        query = form_insert_query(get_object(list_attr[0]), get_table_name(list_attr[0]), elements)
+        self.query.execute(query)
 
     def get_domains(self):
         for child_key, child_value in self.db_schema['dbd_schema'].items():
@@ -168,156 +118,76 @@ class RAMtoSQLite:
         for child_key, child_value in self.db_schema['dbd_schema'].items():
             return [item for sublist in list(child_value['table'].values()) for item in sublist if isinstance(item, ConstraintDetail)]
 
-    def _generate_link_in_domains(self, list_attr):
+    def get_field(self, obj, field=None):
+        if isinstance(obj, IndexDetail):
+            return obj.index_id.table_id
+        elif isinstance(obj, ConstraintDetail):
+            return obj.constraint_id.table_id
+        else:
+            return obj.get_attribute_by_name(field)
+
+    def insert_set(self, elements, from_table, from_field, to_table, to_field):
+        self.query.execute("""DELETE FROM temp""")
+        self.query.execute("""insert into temp VALUES {}""".format(', '.join(elements)))
+        self.query.execute("""update temp
+                              set name = (select {}.id 
+                                          from {}
+                                          where {}.{}=temp.name);""".format(from_table, from_table, from_table, from_field))
+        self.query.execute("""update {}
+                              set {} = (select temp.name
+                                        from temp
+                                        where {}.id=temp.id)""".format(to_table, to_field, to_table))
+
+    def _generate_links(self, list_attr, from_table, from_field, to_table, to_field):
         elements = []
         id_iter = 1
         for element in list_attr:
-            elements.append('({}, \'{}\')'.format(id_iter, element.data_type_id))
+            elements.append('({}, \'{}\')'.format(id_iter, self.get_field(element, to_field)))
             id_iter += 1
-        self.query.execute("""insert into temp_domain_data_type VALUES {}""".format(', '.join(elements)))
-        self.query.execute("""update temp_domain_data_type
-                              set data_type_name = (select dbd$data_types.id 
-                                                    from dbd$data_types
-                                                    where dbd$data_types.type_id=temp_domain_data_type.data_type_name);""")
-        return """update dbd$domains
-                  set data_type_id = (select temp_domain_data_type.data_type_name
-                                      from temp_domain_data_type
-                                      where dbd$domains.id=temp_domain_data_type.domain_id)"""
+        self.insert_set(elements, from_table, from_field, to_table, to_field)
 
-    def _generate_link_in_fields(self, list_attr):
-        elements = []
-        id_iter = 1
-        for element in list_attr:
-            elements.append('({}, \'{}\')'.format(id_iter, element.domain_id))
-            id_iter += 1
-        self.query.execute(
-            """insert into temp_field_domain VALUES {}""".format(', '.join(elements)))
-        self.query.execute("""update temp_field_domain
-                                      set domain_name = (select dbd$domains.id 
-                                                         from dbd$domains
-                                                         where dbd$domains.name=temp_field_domain.domain_name);""")
-        return """update dbd$fields
-                          set domain_id = (select temp_field_domain.domain_name
-                                           from temp_field_domain
-                                           where dbd$fields.id=temp_field_domain.field_id)"""
-
-    def _generate_link_in_fields_t(self, list_attr):
-        elements = []
-        id_iter = 1
-        for element in list_attr:
-            elements.append('({}, \'{}\')'.format(id_iter, element.table_id))
-            id_iter += 1
-        self.query.execute(
-            """insert into temp_field_table VALUES {}""".format(', '.join(elements)))
-        self.query.execute("""update temp_field_table
-                                      set table_name = (select dbd$tables.id 
-                                                         from dbd$tables
-                                                         where dbd$tables.name=temp_field_table.table_name);""")
-        return """update dbd$fields
-                          set table_id = (select temp_field_table.table_name
-                                           from temp_field_table
-                                           where dbd$fields.id=temp_field_table.field_id)"""
-
-    def _generate_link_in_index(self, list_attr):
-        elements = []
-        id_iter = 1
-        for element in list_attr:
-            elements.append('({}, \'{}\')'.format(id_iter, element.index_id.table_id))
-            id_iter += 1
-        self.query.execute("""insert into temp_index_table VALUES {}""".format(', '.join(elements)))
-        self.query.execute("""update temp_index_table
-                                      set table_name = (select dbd$tables.id 
-                                                         from dbd$tables
-                                                         where dbd$tables.name=temp_index_table.table_name);""")
-        return """update dbd$indices
-                  set table_id = (select temp_index_table.table_name
-                                  from temp_index_table
-                                  where dbd$indices.id=temp_index_table.index_id)"""
-
-    def _generate_link_in_constraint(self, list_attr):
-        elements = []
-        id_iter = 1
-        for element in list_attr:
-            elements.append('({}, \'{}\')'.format(id_iter, element.constraint_id.table_id))
-            id_iter += 1
-        self.query.execute("""insert into temp_constraint_table VALUES {}""".format(', '.join(elements)))
-        self.query.execute("""update temp_constraint_table
-                                      set table_name = (select dbd$tables.id 
-                                                         from dbd$tables
-                                                         where dbd$tables.name=temp_constraint_table.table_name);""")
-        return """update dbd$constraints
-                  set table_id = (select temp_constraint_table.table_name
-                                  from temp_constraint_table
-                                  where dbd$constraints.id=temp_constraint_table.constraint_id)"""
-
-    def _generate_link_in_constraint_fk(self, list_attr):
+    def _generate_link_constraint_fk(self, list_attr):
         elements = []
         id_iter = 1
         for element in list_attr:
             if element.constraint_id.constraint_type == 'FOREIGN':
                 elements.append('({}, \'{}\')'.format(id_iter, element.constraint_id.reference))
             id_iter += 1
-        self.query.execute("""DELETE FROM temp_constraint_table;""")
-        self.query.execute("""insert into temp_constraint_table VALUES {}""".format(', '.join(elements)))
-        self.query.execute("""update temp_constraint_table
-                                      set table_name = (select dbd$tables.id 
-                                                         from dbd$tables
-                                                         where dbd$tables.name=temp_constraint_table.table_name);""")
-        return """update dbd$constraints
-                  set reference = (select temp_constraint_table.table_name
-                                  from temp_constraint_table
-                                  where dbd$constraints.id=temp_constraint_table.constraint_id)"""
+        self.insert_set(elements, 'dbd$tables', 'name', 'dbd$constraints', 'reference')
 
-    def _generate_link_in_index_det(self, list_attr):
+    def _generate_link_details(self, list_attr, to_table, to_field):
+        def insert_into_details():
+            if to_table == 'dbd$index_details':
+                self.query.execute("""insert into dbd$index_details (index_id) VALUES {}""".format(
+                    ', '.join(['({})'.format(x) for x in range(1, id_iter)])))
+            elif to_table == 'dbd$constraint_details':
+                self.query.execute("""insert into dbd$constraint_details (constraint_id) VALUES {}""".format(
+                    ', '.join(['({})'.format(x) for x in range(1, id_iter)])))
         elements = []
         id_iter = 1
         for element in list_attr:
             elements.append('({}, \'{}\')'.format(id_iter, element.field_id))
             id_iter += 1
-        self.query.execute("""insert into dbd$index_details (index_id) VALUES {}""".format(', '.join(['({})'.format(x) for x in range(1, id_iter)])))
-        self.query.execute("""insert into temp_index_field VALUES {}""".format(', '.join(elements)))
-        self.query.execute("""update temp_index_field
-                                      set field_id = (select dbd$fields.id 
-                                                      from dbd$fields
-                                                      where dbd$fields.name=temp_index_field.field_id);""")
-        return """update dbd$index_details
-                  set field_id = (select temp_index_field.field_id
-                                  from temp_index_field
-                                  where dbd$index_details.index_id = temp_index_field.index_id)"""
-
-    def _generate_link_in_const_det(self, list_attr):
-        elements = []
-        id_iter = 1
-        for element in list_attr:
-            elements.append('({}, \'{}\')'.format(id_iter, element.field_id))
-            id_iter += 1
-        self.query.execute("""insert into dbd$constraint_details (constraint_id) VALUES {}""".format(', '.join(['({})'.format(x) for x in range(1, id_iter)])))
-        self.query.execute("""insert into temp_index_field VALUES {}""".format(', '.join(elements)))
-        self.query.execute("""update temp_index_field
-                                      set field_id = (select dbd$fields.id 
-                                                      from dbd$fields
-                                                      where dbd$fields.name=temp_index_field.field_id);""")
-        return """update dbd$constraint_details
-                  set field_id = (select temp_index_field.field_id
-                                  from temp_index_field
-                                  where dbd$constraint_details.constraint_id = temp_index_field.index_id)"""
+        insert_into_details()
+        self.insert_set(elements, 'dbd$fields', 'name', to_table, to_field)
 
     def generate(self):
-        self.query.execute(self._generate_obj_in_db(self.get_schemas()))
-        self.query.execute(self._generate_obj_in_db(self.get_domains()))
-        self.query.execute(self._generate_obj_in_db(self.get_tables()))
-        self.query.execute(self._generate_obj_in_db(self.get_fields()))
-        self.query.execute(self._generate_obj_in_db(self.get_constraints()))
-        self.query.execute(self._generate_obj_in_db(self.get_indexes()))
+        self._generate_record(self.get_schemas())
+        self._generate_record(self.get_domains())
+        self._generate_record(self.get_tables())
+        self._generate_record(self.get_fields())
+        self._generate_record(self.get_constraints())
+        self._generate_record(self.get_indexes())
         self.query.commit()
-        self.query.execute(self._generate_link_in_domains(self.get_domains()))
-        self.query.execute(self._generate_link_in_fields(self.get_fields()))
-        self.query.execute(self._generate_link_in_fields_t(self.get_fields()))
-        self.query.execute(self._generate_link_in_index(self.get_indexes()))
-        self.query.execute(self._generate_link_in_constraint(self.get_constraints()))
-        self.query.execute(self._generate_link_in_constraint_fk(self.get_constraints()))
-        # self.query.execute(self._generate_link_in_index_det(self.get_indexes()))
-        self.query.execute(self._generate_link_in_const_det(self.get_constraints()))
+
+        self._generate_links(self.get_domains(), 'dbd$data_types', 'type_id', 'dbd$domains', 'data_type_id')
+        self._generate_links(self.get_fields(), 'dbd$domains', 'name', 'dbd$fields', 'domain_id')
+        self._generate_links(self.get_fields(), 'dbd$tables', 'name', 'dbd$fields', 'table_id')
+        self._generate_links(self.get_indexes(), 'dbd$tables', 'name', 'dbd$indices', 'table_id')
+        self._generate_links(self.get_constraints(), 'dbd$tables', 'name', 'dbd$constraints', 'table_id')
+        self._generate_link_constraint_fk(self.get_constraints())
+        self._generate_link_details(self.get_indexes(), 'dbd$index_details', 'field_id')
+        self._generate_link_details(self.get_constraints(), 'dbd$constraint_details', 'field_id')
         self.query.commit()
 
 
@@ -326,8 +196,3 @@ class Query(AbstractQuery):
         with contextlib.suppress(FileNotFoundError):
             os.remove('db.sqlite')
         super().__init__(sqlite3, 'db.sqlite')
-
-
-reader = Reader('O:/progas/python/metadata/tasks.xml')
-generator = RAMtoSQLite(reader.xml_to_ram())
-generator.generate()

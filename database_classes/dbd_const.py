@@ -40,9 +40,9 @@ create table dbd$domains (
     show_lead_nulls boolean default(null),      -- следует ли показывать лидирующие нули?
     thousands_separator boolean default(null),  -- нужен ли разделитель тысяч?
     summable boolean default(null),             -- признак того, что поле является суммируемым
-    case_sensitive boolean default(null),       -- признак необходимости регистронезависимого поиска для поля
---    uuid varchar unique not null COLLATE NOCASE, -- уникальный идентификатор домена
-    FOREIGN KEY(data_type_id) REFERENCES dbd$data_types(id)
+    case_sensitive boolean default(null)       -- признак необходимости регистронезависимого поиска для поля
+--    ,uuid varchar unique not null COLLATE NOCASE, -- уникальный идентификатор домена
+--    ,FOREIGN KEY(data_type_id) REFERENCES dbd$data_types(id)
 );
 
 create index "idx.FZX832TFV" on dbd$domains(data_type_id);
@@ -63,7 +63,7 @@ create table dbd$tables (
     can_delete boolean default(null),     -- разрешено ли удаление в таблице
     temporal_mode varchar default(null),  -- временная таблица или нет? Если временная, то какого типа?
     means varchar default(null)          -- шаблон описания записи таблицы
---    uuid varchar unique not null COLLATE NOCASE  -- уникальный идентификатор таблицы
+--    ,uuid varchar unique not null COLLATE NOCASE  -- уникальный идентификатор таблицы
 );
 
 create index "idx.GCOFIBEBJ" on dbd$tables(name);
@@ -88,9 +88,9 @@ create table dbd$fields (
     show_in_details boolean default(null), -- следует ли отображать значение поля в полной информации о записи таблицы?
     is_mean boolean default(null),         -- является ли поле элементом описания записи таблицы?
     autocalculated boolean default(null),  -- признак того, что значение в поле вычисляется программным кодом
-    required boolean default(null),        -- признак того, что поле дорлжно быть заполнено
---    uuid varchar unique not null COLLATE NOCASE, -- уникальный идентификатор поля
-    FOREIGN KEY(table_id) REFERENCES dbd$tables(id)
+    required boolean default(null)        -- признак того, что поле дорлжно быть заполнено
+--    ,uuid varchar unique not null COLLATE NOCASE, -- уникальный идентификатор поля
+--    ,FOREIGN KEY(table_id) REFERENCES dbd$tables(id)
 );
 
 create index "idx.7UAKR6FT7" on dbd$fields(table_id);
@@ -120,9 +120,9 @@ create table dbd$constraints (
     unique_key_id integer default(null),    -- (опционально) идентификатор ограничения (dbd$constraints) таблицы, на которую ссылается внешний ключ (*1*)
     has_value_edit boolean default(null),   -- признак наличия поля ввода ключа
     cascading_delete boolean default(null), -- признак каскадного удаления для внешнего ключа
-    expression varchar default(null),       -- выражение для контрольного ограничения
---    uuid varchar unique not null COLLATE NOCASE, -- уникальный идентификатор ограничения
-    FOREIGN KEY(table_id) REFERENCES dbd$tables(id)
+    expression varchar default(null)       -- выражение для контрольного ограничения
+--    ,uuid varchar unique not null COLLATE NOCASE, -- уникальный идентификатор ограничения
+--    ,FOREIGN KEY(table_id) REFERENCES dbd$tables(id)
 );
 
 create index "idx.6F902GEQ3" on dbd$constraints(table_id);
@@ -156,9 +156,9 @@ create table dbd$indices (
     table_id integer not null,                          -- идентификатор таблицы (dbd$tables)
     name varchar default(null),                         -- имя индекса
     local boolean default(0),                           -- показывает тип индекса: локальный или глобальный
-    kind char default(null),                            -- вид индекса (простой/уникальный/полнотекстовый)
---    uuid varchar unique not null COLLATE NOCASE,         -- уникальный идентификатор индекса
-    FOREIGN KEY(table_id) REFERENCES dbd$tables(id)
+    kind char default(null)                            -- вид индекса (простой/уникальный/полнотекстовый)
+--    ,uuid varchar unique not null COLLATE NOCASE,         -- уникальный идентификатор индекса
+--    ,FOREIGN KEY(table_id) REFERENCES dbd$tables(id)
 );
 
 create index "idx.12XXTJUYZ" on dbd$indices(table_id);
@@ -380,6 +380,11 @@ order by
 """
 
 SQL_DBD_TEMPORARY_TABLES_INIT = """
+CREATE TEMPORARY TABLE temp (
+    id INTEGER NOT NULL,
+    name varchar NOT NULL
+);
+
 CREATE TEMPORARY TABLE temp_domain_data_type (
     domain_id INTEGER NOT NULL,
     data_type_name varchar NOT NULL

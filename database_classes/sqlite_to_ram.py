@@ -78,9 +78,9 @@ class SQLiteToRAM:
             for table in self.select_func(self.get_query('dbd$tables')):
                 table_obj = self._create_object(self.get_object_by_name('dbd$tables'), table)
                 db_schema['table'][table_obj] = []
-                for field in self.select_func(self.get_query('dbd$fields', table_obj.name)):
-                    field_obj = self._create_object(self.get_object_by_name('dbd$fields'), field)
-                    db_schema['table'][table_obj].append(field_obj)
+                # for field in self.select_func(self.get_query('dbd$fields', table_obj.name)):
+                #     field_obj = self._create_object(self.get_object_by_name('dbd$fields'), field)
+                #     db_schema['table'][table_obj].append(field_obj)
 
     def write_to_concole(self):
         pp = pprint.PrettyPrinter(depth=6)
