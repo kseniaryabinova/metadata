@@ -2,6 +2,7 @@ import sqlite3
 import contextlib
 import os
 from database_classes.dbd_const import SQL_DBD_Init
+from parser_classes.xml_to_ram import Reader
 from parser_classes.metadata import ConstraintDetail
 from parser_classes.metadata import IndexDetail
 from parser_classes.metadata import Field
@@ -196,3 +197,8 @@ class Query(AbstractQuery):
         with contextlib.suppress(FileNotFoundError):
             os.remove('db.sqlite')
         super().__init__(sqlite3, 'db.sqlite')
+
+
+reader = Reader('O:/progas/python/metadata/tasks.xml')
+generator = RAMtoSQLite(reader.xml_to_ram())
+generator.generate()

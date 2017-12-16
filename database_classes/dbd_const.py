@@ -338,13 +338,23 @@ order by
 
 create view dbd$view_constraints as
 select
-  dbd$constraints.id "constraint_id",
-  dbd$constraints.constraint_type "constraint_type",
---  dbd$constraint_details.position "position",
-  dbd$schemas.name "schema",
-  dbd$tables.name "table_name",
   dbd$fields.name "field_name",
-  "references".name "reference"
+  dbd$tables.name "table_id",
+  dbd$constraints.id "id",
+  dbd$constraints.name "name",
+  dbd$constraints.constraint_type "constraint_type",
+  "references".name "reference",
+  dbd$constraints.unique_key_id "unique_key_id",
+  CASE 
+    WHEN dbd$constraints.has_value_edit=1 THEN 'True'
+  END has_value_edit,
+  CASE 
+    WHEN dbd$constraints.cascading_delete=1 THEN 'True'
+    WHEN dbd$constraints.cascading_delete=0 THEN 'False'
+    WHEN dbd$constraints.cascading_delete is null THEN 'None'
+  END cascading_delete,
+  dbd$constraints.expression "expression"
+--  dbd$constraint_details.position "position",
 from
   dbd$constraint_details
   inner join dbd$constraints on dbd$constraint_details.constraint_id = dbd$constraints.id
@@ -358,16 +368,20 @@ order by
 
 create view dbd$view_indices as
 select
-  dbd$indices.id "index_id",
-  dbd$indices.name as index_name,
-  dbd$schemas.name "schema",
-  dbd$tables.name as table_name,
-  dbd$indices.local,
-  dbd$indices.kind,
+  dbd$fields.name "field_name",
+  dbd$indices.id "id",
+  dbd$indices.name "name",
+  dbd$tables.name "table_id",
+  CASE 
+    WHEN dbd$indices.local=1 THEN 'True'
+  END local,
+  dbd$indices.kind "kind",
+  dbd$index_details.expression "expression",
+  dbd$index_details.descend "descend"
 --  dbd$index_details.position,
-  dbd$fields.name as field_name,
-  dbd$index_details.expression,
-  dbd$index_details.descend
+--  dbd$fields.name as field_name,
+--  dbd$index_details.expression,
+--  dbd$index_details.descend
 from
   dbd$index_details
   inner join dbd$indices on dbd$index_details.index_id = dbd$indices.id
@@ -383,36 +397,6 @@ SQL_DBD_TEMPORARY_TABLES_INIT = """
 CREATE TEMPORARY TABLE temp (
     id INTEGER NOT NULL,
     name varchar NOT NULL
-);
-
-CREATE TEMPORARY TABLE temp_domain_data_type (
-    domain_id INTEGER NOT NULL,
-    data_type_name varchar NOT NULL
-);
-
-CREATE TEMPORARY TABLE temp_field_domain(
-    field_id INTEGER NOT NULL,
-    domain_name varchar NOT NULL
-);
-
-CREATE TEMPORARY TABLE temp_field_table(
-    field_id INTEGER NOT NULL,
-    table_name varchar NOT NULL
-);
-
-CREATE TEMPORARY TABLE temp_index_table(
-    index_id INTEGER NOT NULL,
-    table_name varchar NOT NULL
-);
-
-CREATE TEMPORARY TABLE temp_constraint_table(
-    constraint_id INTEGER NOT NULL,
-    table_name varchar NOT NULL
-);
-
-CREATE TABLE temp_index_field(
-    index_id INTEGER NOT NULL,
-    field_id varchar NOT NULL
 );
 """
 

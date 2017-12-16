@@ -124,8 +124,8 @@ class ConstraintDetail(AbstractDBObject):
 
     def is_valid(self):
         if not self.constraint_id or not self.field_id:
-            self.__dict__ = None
-            raise Exception
+            return False
+        return True
 
 
 class Index(AbstractDBObject):
@@ -138,7 +138,7 @@ class Index(AbstractDBObject):
         # self.uuid = None
 
     def is_valid(self):
-        if not self.name:
+        if not self.name and not self.table_id:
             return False
         return True
 
@@ -154,5 +154,5 @@ class IndexDetail(AbstractDBObject):
 
     def is_valid(self):
         if not self.index_id or not self.field_id:
-            self.__dict__ = None
-            raise Exception
+            return False
+        return True
