@@ -1,8 +1,11 @@
 class AbstractDBObject:
-    def set_attributes(self, init_dict):
+    def set_dict_attributes(self, init_dict):
         for key in self.__dict__.keys():
             if key in init_dict.keys():
                 self.__dict__[key] = init_dict[key]
+
+    def set_list_attributes(self, init_list):
+        self.__dict__ = dict(zip(self.__dict__.keys(), init_list))
 
     def get_attributes(self):
         return self.__dict__
@@ -27,7 +30,7 @@ class DbdSchema(AbstractDBObject):
 
 class Domain(AbstractDBObject):
     def __init__(self):
-        self.id = None
+        # self.id = None
         self.name = None
         self.description = None
         self.data_type_id = None
@@ -42,7 +45,7 @@ class Domain(AbstractDBObject):
         self.thousands_separator = None
         self.summable = None
         self.case_sensitive = None
-        self.uuid = None
+        # self.uuid = None
 
     def is_valid(self):
         if not self.name:
@@ -52,7 +55,7 @@ class Domain(AbstractDBObject):
 
 class Table(AbstractDBObject):
     def __init__(self):
-        self.id = None
+        # self.id = None
         self.schema_id = None
         self.name = None
         self.description = None
@@ -61,7 +64,7 @@ class Table(AbstractDBObject):
         self.can_delete = None
         self.temporal_mode = None
         self.means = None
-        self.uuid = None
+        # self.uuid = None
 
     def is_valid(self):
         if not self.name:
@@ -71,9 +74,9 @@ class Table(AbstractDBObject):
 
 class Field(AbstractDBObject):
     def __init__(self):
-        self.id = None
+        # self.id = None
         self.table_id = None
-        self.position = None
+        # self.position = None
         self.name = None
         self.russian_short_name = None
         self.description = None
@@ -85,7 +88,7 @@ class Field(AbstractDBObject):
         self.is_mean = None
         self.autocalculated = None
         self.required = None
-        self.uuid = None
+        # self.uuid = None
 
     def is_valid(self):
         if not self.name:
@@ -95,7 +98,7 @@ class Field(AbstractDBObject):
 
 class Constraint(AbstractDBObject):
     def __init__(self):
-        self.id = None
+        # self.id = None
         self.table_id = None
         self.name = None
         self.constraint_type = None
@@ -104,7 +107,7 @@ class Constraint(AbstractDBObject):
         self.has_value_edit = None
         self.cascading_delete = None
         self.expression = None
-        self.uuid = None
+        # self.uuid = None
 
     def is_valid(self):
         if not self.constraint_type:
@@ -114,9 +117,9 @@ class Constraint(AbstractDBObject):
 
 class ConstraintDetail(AbstractDBObject):
     def __init__(self):
-        self.id = None
+        # self.id = None
         self.constraint_id = None
-        self.position = None
+        # self.position = None
         self.field_id = None
 
     def is_valid(self):
@@ -127,12 +130,12 @@ class ConstraintDetail(AbstractDBObject):
 
 class Index(AbstractDBObject):
     def __init__(self):
-        self.id = None
+        # self.id = None
         self.table_id = None
         self.name = None
         self.local = None
         self.kind = None
-        self.uuid = None
+        # self.uuid = None
 
     def is_valid(self):
         if not self.name:
@@ -142,9 +145,9 @@ class Index(AbstractDBObject):
 
 class IndexDetail(AbstractDBObject):
     def __init__(self):
-        self.id = None
+        # self.id = None
         self.index_id = None
-        self.position = None
+        # self.position = None
         self.field_id = None
         self.expression = None
         self.descend = None

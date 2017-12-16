@@ -139,7 +139,7 @@ create table dbd$constraint_details (
     id integer primary key autoincrement default(null),
     constraint_id integer not null,          -- идентификатор ограничения (dbd$constraints)
 --    position integer not null,               -- номер элемента ограничения
-    field_id integer not null default(null),  -- идентификатор поля (dbd$fields) в таблице, для которой определено ограничение
+    field_id integer default(null),  -- идентификатор поля (dbd$fields) в таблице, для которой определено ограничение
     FOREIGN KEY(field_id) REFERENCES dbd$fields(id),
     FOREIGN KEY(constraint_id) REFERENCES dbd$constraints(id)
 );
@@ -227,31 +227,53 @@ insert into dbd$settings(key, value) values ('dbd.version', '%(dbd_version)s');
 SQL_DBD_VIEWS_INIT = """
 create view dbd$view_fields as
 select
-  dbd$schemas.name "schema",
-  dbd$tables.name "table",
+--  dbd$schemas.name "schema",
 --  dbd$fields.position "position",
+  dbd$fields.id "id",
   dbd$fields.name "name",
+  dbd$tables.name "table_id",
   dbd$fields.russian_short_name "russian_short_name",
   dbd$fields.description "description",
-  dbd$data_types.type_id "type_id",
-  dbd$domains.length "length",
-  dbd$domains.char_length,
-  dbd$domains.width "width",
-  dbd$domains.align "align",
-  dbd$domains.precision "precision",
-  dbd$domains.scale "scale",
-  dbd$domains.show_null "show_null",
-  dbd$domains.show_lead_nulls "show_lead_nulls",
-  dbd$domains.thousands_separator "thousands_separator",
-  dbd$domains.summable,
-  dbd$domains.case_sensitive "case_sensitive",
-  dbd$fields.can_input "can_input",
-  dbd$fields.can_edit "can_edit",
-  dbd$fields.show_in_grid "show_in_grid",
-  dbd$fields.show_in_details "show_in_details",
-  dbd$fields.is_mean "is_mean",
-  dbd$fields.autocalculated "autocalculated",
-  dbd$fields.required "required"
+--  dbd$data_types.type_id "type_id",
+  dbd$domains.name "domain_id",
+--  dbd$domains.char_length,
+--  dbd$domains.width "width",
+--  dbd$domains.align "align",
+--  dbd$domains.precision "precision",
+--  dbd$domains.scale "scale",
+--  dbd$domains.show_null "show_null",
+--  dbd$domains.show_lead_nulls "show_lead_nulls",
+--  dbd$domains.thousands_separator "thousands_separator",
+--  dbd$domains.summable,
+--  dbd$domains.case_sensitive "case_sensitive",
+  CASE 
+    WHEN dbd$fields.can_input=1 THEN 'True'
+  END can_input,
+  CASE 
+    WHEN dbd$fields.can_edit=1 THEN 'True'
+  END can_edit,
+  CASE 
+    WHEN dbd$fields.show_in_grid=1 THEN 'True'
+  END show_in_grid,
+  CASE 
+    WHEN dbd$fields.show_in_details=1 THEN 'True'
+  END show_in_details,
+  CASE 
+    WHEN dbd$fields.is_mean=1 THEN 'True'
+  END is_mean,
+  CASE 
+    WHEN dbd$fields.autocalculated=1 THEN 'True'
+  END autocalculated,
+  CASE 
+    WHEN dbd$fields.required=1 THEN 'True'
+  END required
+--  dbd$fields.can_input "can_input",
+--  dbd$fields.can_edit "can_edit",
+--  dbd$fields.show_in_grid "show_in_grid",
+--  dbd$fields.show_in_details "show_in_details",
+--  dbd$fields.is_mean "is_mean",
+--  dbd$fields.autocalculated "autocalculated",
+--  dbd$fields.required "required"
 from dbd$fields
   inner join dbd$tables on dbd$fields.table_id = dbd$tables.id
   inner join dbd$domains on dbd$fields.domain_id = dbd$domains.id
@@ -266,21 +288,53 @@ select
   dbd$domains.id,
   dbd$domains.name,
   dbd$domains.description,
-  dbd$data_types.type_id,
+  dbd$data_types.type_id AS data_type_id,
   dbd$domains.length,
   dbd$domains.char_length,
   dbd$domains.width,
   dbd$domains.align,
-  dbd$domains.summable,
   dbd$domains.precision,
   dbd$domains.scale,
-  dbd$domains.show_null,
-  dbd$domains.show_lead_nulls,
-  dbd$domains.thousands_separator,
-  dbd$domains.case_sensitive "case_sensitive"
+  CASE 
+    WHEN dbd$domains.show_null=1 THEN 'True'
+  END show_null,
+  CASE 
+    WHEN dbd$domains.show_lead_nulls=1 THEN 'True'
+  END show_lead_nulls,
+  CASE 
+    WHEN dbd$domains.thousands_separator=1 THEN 'True'
+  END thousands_separator,
+  CASE 
+    WHEN dbd$domains.summable=1 THEN 'True'
+  END summable,
+  CASE 
+    WHEN dbd$domains.case_sensitive=1 THEN 'True'
+  END case_sensitive
 from dbd$domains
   inner join dbd$data_types on dbd$domains.data_type_id = dbd$data_types.id
 order by dbd$domains.id;
+
+create view dbd$view_tables as
+select
+  dbd$tables.id "id",
+  dbd$tables.schema_id "schema_id",
+  dbd$tables.name "name",
+  dbd$tables.description "description",
+  CASE 
+    WHEN dbd$tables.can_add=1 THEN 'True'
+  END can_add,
+  CASE 
+    WHEN dbd$tables.can_edit=1 THEN 'True'
+  END can_edit,
+  CASE 
+    WHEN dbd$tables.can_delete=1 THEN 'True'
+  END can_delete,
+  dbd$tables.temporal_mode "temporal_mode",
+  dbd$tables.means "means"
+from
+  dbd$tables
+order by
+  dbd$tables.id;
 
 create view dbd$view_constraints as
 select
@@ -325,10 +379,42 @@ order by
    --dbd$index_details.position;
 """
 
+SQL_DBD_TEMPORARY_TABLES_INIT = """
+CREATE TEMPORARY TABLE temp_domain_data_type (
+    domain_id INTEGER NOT NULL,
+    data_type_name varchar NOT NULL
+);
+
+CREATE TEMPORARY TABLE temp_field_domain(
+    field_id INTEGER NOT NULL,
+    domain_name varchar NOT NULL
+);
+
+CREATE TEMPORARY TABLE temp_field_table(
+    field_id INTEGER NOT NULL,
+    table_name varchar NOT NULL
+);
+
+CREATE TEMPORARY TABLE temp_index_table(
+    index_id INTEGER NOT NULL,
+    table_name varchar NOT NULL
+);
+
+CREATE TEMPORARY TABLE temp_constraint_table(
+    constraint_id INTEGER NOT NULL,
+    table_name varchar NOT NULL
+);
+
+CREATE TABLE temp_index_field(
+    index_id INTEGER NOT NULL,
+    field_id varchar NOT NULL
+);
+"""
+
 COMMIT = """
 commit;
 """
 
 SQL_DBD_Init = SQL_DBD_PRE_INIT + SQL_DBD_DOMAINS_TABLE_INIT + \
     SQL_DBD_TABLES_TABLE_INIT + SQL_DBD_TABLES_INIT + \
-    SQL_DBD_VIEWS_INIT# + COMMIT
+    SQL_DBD_VIEWS_INIT + SQL_DBD_TEMPORARY_TABLES_INIT# + COMMIT

@@ -166,7 +166,7 @@ class Reader:
 
     @staticmethod
     def create_object(obj, xml_attr, parse_func):
-        obj.set_attributes(parse_func(xml_attr))
+        obj.set_dict_attributes(parse_func(xml_attr))
         if obj.is_valid():
             return obj
         else:
@@ -174,7 +174,7 @@ class Reader:
 
     def create_detail(self, obj, detail_name):
         detail = self.get_object_by_name(detail_name+'_detail')
-        detail.set_attributes({'field_id': obj.name, detail_name+'_id': obj})
+        detail.set_dict_attributes({'field_id': obj.name, detail_name + '_id': obj})
         obj.name = None
         return detail
 
