@@ -375,9 +375,11 @@ select
   CASE 
     WHEN dbd$indices.local=1 THEN 'True'
   END local,
+  CASE 
+    WHEN dbd$index_details.descend=1 THEN 'True'
+  END descend,
   dbd$indices.kind "kind",
-  dbd$index_details.expression "expression",
-  dbd$index_details.descend "descend"
+  dbd$index_details.expression "expression"
 --  dbd$index_details.position,
 --  dbd$fields.name as field_name,
 --  dbd$index_details.expression,

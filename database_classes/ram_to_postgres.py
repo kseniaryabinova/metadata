@@ -3,6 +3,8 @@ from parser_classes.metadata import Field
 from parser_classes.metadata import IndexDetail
 from parser_classes.metadata import ConstraintDetail
 from parser_classes.xml_to_ram import Reader
+from database_classes.ram_to_sqlite import RAMtoSQLite
+from database_classes.sqlite_to_ram import SQLiteToRAM
 import re
 import copy
 
@@ -99,8 +101,8 @@ class Postgres:
     def generate_domains(self):
         def generate_domain(domain_obj):
             sql = 'CREATE DOMAIN {} '.format(self.get_domain_name(domain_obj))
-            domain_type = self.get_domain_type(domain_obj.type)
-            if domain.type == 'STRING':
+            domain_type = self.get_domain_type(domain_obj.data_type_id)
+            if domain.data_type_id == 'STRING':
                 domain_type += '({})'.format(domain_obj.char_length)
             sql += 'AS {} ;'.format(domain_type)
             domain.description = self.get_domain_name(domain_obj)
@@ -189,5 +191,10 @@ class Query:
 
 
 reader = Reader('O:/progas/python/metadata/tasks.xml')
-generator = Postgres(reader.xml_to_ram())
+sqlite = RAMtoSQLite(reader.xml_to_ram())
+sqlite.generate()
+sqlite.query.kill_connection()
+ram = SQLiteToRAM()
+ram.create_objects()
+generator = Postgres(ram.get_schema())
 generator.generate()

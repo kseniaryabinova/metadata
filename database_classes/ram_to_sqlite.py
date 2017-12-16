@@ -199,6 +199,6 @@ class Query(AbstractQuery):
         super().__init__(sqlite3, 'db.sqlite')
 
 
-reader = Reader('O:/progas/python/metadata/tasks.xml')
-generator = RAMtoSQLite(reader.xml_to_ram())
-generator.generate()
+# reader = Reader('O:/progas/python/metadata/tasks.xml')
+# generator = RAMtoSQLite(reader.xml_to_ram())
+# generator.generate()

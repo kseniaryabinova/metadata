@@ -111,9 +111,9 @@ class Query(AbstractQuery):
         super().__init__(sqlite3, 'db.sqlite')
 
 
-ram = SQLiteToRAM()
-ram.create_objects()
-ram.write_to_concole()
-writer = Writer(ram.get_schema())
-writer.ram_to_xml()
-writer.write_to_file()
+# ram = SQLiteToRAM()
+# ram.create_objects()
+# ram.write_to_concole()
+# writer = Writer(ram.get_schema())
+# writer.ram_to_xml()
+# writer.write_to_file()
