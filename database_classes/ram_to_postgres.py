@@ -5,35 +5,16 @@ from parser_classes.metadata import ConstraintDetail
 from parser_classes.xml_to_ram import Reader
 from database_classes.ram_to_sqlite import RAMtoSQLite
 from database_classes.sqlite_to_ram import SQLiteToRAM
+from database_classes.query import AbstractQuery
 import re
 import copy
+import time
 
 
-class Postgres:
+class RAMtoPostgres:
     def __init__(self, database_schema):
         self.database_schema = database_schema
         self.query = Query()
-
-    def find_field(self, obj_list, obj_name):
-        for element in obj_list:
-            if element.name == obj_name:
-                return element
-
-    def get_domain_in_db(self, domain_name):
-        for domain in self.get_domains():
-            if domain.name == domain_name:
-                return domain.description
-
-    def get_primary_keys(self, table_name):
-        sql = 'SELECT a.attname FROM pg_index i ' \
-              'JOIN pg_attribute a ON a.attrelid = i.indrelid ' \
-              'AND a.attnum = ANY(i.indkey) ' \
-              'WHERE  i.indrelid = \'{}\'::regclass ' \
-              'AND i.indisprimary;'.format(table_name)
-        self.query.execute(sql)
-        result = self.query.fetchall()
-        if result:
-            return result[0][0]
 
     def get_tables(self):
         for child_key, child_value in self.database_schema['dbd_schema'].items():
@@ -43,131 +24,119 @@ class Postgres:
         for child_key, child_value in self.database_schema['dbd_schema'].items():
             return child_value['domain']
 
-    def generate_tables(self):
-        tables = []
-        for table, attr_dict in self.get_tables().items():
-            sql = 'CREATE TABLE {}('.format(table.name)
-            column_list = []
-            for field in attr_dict:
-                if isinstance(field, Field):
-                    column_list.append(self.generate_field(field))
-            sql += ', '.join(column_list)
-            sql += self.generate_primary_key(attr_dict) + ');'
-            tables.append(sql)
-        return tables
-
     def generate_field(self, field):
-        domain = self.find_field(self.get_domains(), field.domain_id)
-        return field.name + ' ' + self.get_domain_in_db(domain.name)
+        return field.name + ' ' + self.get_domain_name(field.domain_id)
 
-    def get_domain_type(self, domain):
-        domain_type = ''
+    @staticmethod
+    def get_domain_type(domain):
         if domain in ['STRING', 'MEMO']:
-            domain_type = 'varchar'
-        elif domain == 'BOOLEAN':
-            domain_type = 'BOOLEAN'
-        elif domain == 'DATE':
-            domain_type = 'date'
-        elif domain == 'TIME':
-            domain_type = 'time'
-        elif domain in ['LARGEINT', 'CODE']:
-            domain_type = 'bigint'
-        elif domain in ['WORD', 'BYTE', 'SMALLINT']:
-            domain_type = 'INTEGER'
-        elif domain == 'BLOB':
-            domain_type = 'bytea'
-        elif domain == 'FLOAT':
-            domain_type = 'REAL'
-        return domain_type
+            return 'varchar'
+        if domain == 'BOOLEAN':
+            return 'BOOLEAN'
+        if domain == 'DATE':
+            return 'date'
+        if domain == 'TIME':
+            return 'time'
+        if domain in ['LARGEINT', 'CODE']:
+            return 'bigint'
+        if domain in ['WORD', 'BYTE', 'SMALLINT']:
+            return 'INTEGER'
+        if domain == 'BLOB':
+            return 'bytea'
+        if domain == 'FLOAT':
+            return 'REAL'
 
-    def replace_all(self, text, dic):
-        new_text = copy.copy(text)
-        for i, j in dic.items():
-            new_text = new_text.replace(i, j)
-        return new_text
+    def get_domain_name(self, domain_name):
+        def replace_all(text, dic):
+            new_text = copy.copy(text)
+            for i, j in dic.items():
+                new_text = new_text.replace(i, j)
+            return new_text
 
-    def get_domain_name(self, domain):
-        if re.match("^[A-Za-z0-9_-]*$", domain.name) == None:
+        if re.match("^[A-Za-z0-9_-]*$", domain_name) is None:
             symbols = (u"абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
                        u"abvgdeejzijklmnoprstufhzc_s_y_euaABVGDEEJZIJKLMNOPRSTUFHZCSS_Y_EUA")
             tr = {ord(a): ord(b) for a, b in zip(*symbols)}
-            new_name = domain.name.translate(tr)
-            new_name = self.replace_all(new_name, {' ': '_', '.': '', '\\': '', '-': '_', '/': '_'})
+            new_name = domain_name.translate(tr)
+            new_name = replace_all(new_name, {' ': '_', '.': '', '\\': '', '-': '_', '/': '_'})
             return new_name
         else:
-            new_name = self.replace_all(domain.name, {' ': '_', '.': '', '\\': '', '-': '_', '/': '_'})
+            new_name = replace_all(domain_name, {' ': '_', '.': '', '\\': '', '-': '_', '/': '_'})
             return new_name
 
     def generate_domains(self):
         def generate_domain(domain_obj):
-            sql = 'CREATE DOMAIN {} '.format(self.get_domain_name(domain_obj))
+            name = self.get_domain_name(domain_obj.name)
+            sql = 'CREATE DOMAIN {} '.format(name)
             domain_type = self.get_domain_type(domain_obj.data_type_id)
             if domain.data_type_id == 'STRING':
                 domain_type += '({})'.format(domain_obj.char_length)
             sql += 'AS {} ;'.format(domain_type)
-            domain.description = self.get_domain_name(domain_obj)
             return sql
         domains = []
         for domain in self.get_domains():
             domains.append(generate_domain(domain))
         return domains
 
-    def generate_primary_key(self, table_attr):
-        fields = []
-        for const in table_attr:
-            if isinstance(const, ConstraintDetail) and const.constraint_id.constraint_type == 'PRIMARY':
-                fields.append(const.field_id)
-        if not fields:
-            return ''
-        else:
-            return ', PRIMARY KEY ({})'.format(', '.join(fields))
+    def generate_tables(self):
+        tables = []
+        for table, attr_dict in self.get_tables().items():
+            sql = 'CREATE TABLE {}('.format(table.name)
+            columns = {}
+            for field in attr_dict:
+                if isinstance(field, Field):
+                    columns[field.name] = '{} {} '.format(field.name, self.get_domain_name(field.domain_id))
+            for const in attr_dict:
+                if isinstance(const, ConstraintDetail):
+                    if const.constraint_id.constraint_type == 'PRIMARY':
+                        columns[const.field_id] += 'PRIMARY KEY'
+            sql += ', '.join(columns.values())
+            sql += ');'
+            tables.append(sql)
+        return tables
 
     def generate_foreign_keys(self):
-        def generate_foreign_key(table, table_attr):
-            fields = []
-            for const in table_attr:
-                if isinstance(const, ConstraintDetail) and const.constraint_id.constraint_type == 'FOREIGN':
-                    sql = 'alter table {} ' \
-                          'add constraint fk_{} ' \
-                          'foreign key ({}) ' \
-                          'REFERENCES {} ({}); '.format(table.name,
-                                                        const.constraint_id.reference + '_' + const.field_id,
-                                                        const.field_id, const.constraint_id.reference,
-                                                        self.get_primary_keys(const.constraint_id.reference))
-                    fields.append(sql)
-            return fields
         fks = []
-        for table_name, attr_dict in self.get_tables().items():
-            fks += generate_foreign_key(table_name, attr_dict)
+        for table, attr_dict in self.get_tables().items():
+            for const in attr_dict:
+                if isinstance(const, ConstraintDetail) and const.constraint_id.constraint_type == 'FOREIGN':
+                    sql = 'ALTER TABLE {} ADD CONSTRAINT {} FOREIGN KEY ({}) REFERENCES {} '.\
+                        format(table.name, const.field_id, const.field_id, const.constraint_id.reference)
+                    if const.constraint_id.cascading_delete is True:
+                        sql += 'ON DELETE CASCADE;'
+                    if const.constraint_id.cascading_delete is False:
+                        sql += 'ON DELETE RESTRICT;'
+                    if const.constraint_id.cascading_delete is None:
+                        sql += 'ON DELETE SET NULL;'
+                    fks.append(sql)
         return fks
 
     def generate_indexes(self):
-        sql = []
+        indices = []
         for table_key, table_child in self.get_tables().items():
             for index in table_child:
                 if isinstance(index, IndexDetail):
-                    sql.append('CREATE INDEX ' + table_key.name + '_' + index.field_id +
-                               ' ON ' + table_key.name + ' (' + index.field_id + ');')
-        return sql
+                    indices.append('CREATE INDEX {}_{} ON {} ({});'.format(table_key.name, index.field_id,
+                                                                           table_key.name, index.field_id))
+        return indices
 
     def generate_sql(self):
+        self.query.begin()
         for domain in self.generate_domains():
             self.query.execute(domain)
-        self.query.execute('commit')
         for table in self.generate_tables():
             self.query.execute(table)
+        for fk in self.generate_foreign_keys():
+            self.query.execute(fk)
         for index in self.generate_indexes():
             self.query.execute(index)
-        self.query.execute('commit')
-        for foreign_key in self.generate_foreign_keys():
-            self.query.execute(foreign_key)
-        self.query.execute('commit')
+        self.query.commit()
 
     def generate(self):
         self.generate_sql()
 
 
-class Query:
+class Query(AbstractQuery):
     def __init__(self):
         self.conn = psycopg2.connect(dbname='postgres', user='postgres', password='123')
         self.cursor = self.conn.cursor()
@@ -176,25 +145,17 @@ class Query:
         self.cursor.execute("COMMIT")
         self.cursor.execute("CREATE DATABASE test;")
         self.cursor.execute("COMMIT")
-        self.conn = psycopg2.connect(dbname='test', user='postgres', password='123')
-        self.cursor = self.conn.cursor()
-
-    def kill_connection(self):
-        self.cursor.close()
-        self.conn.close()
-
-    def execute(self, sql):
-        self.cursor.execute(sql)
-
-    def fetchall(self):
-        return self.cursor.fetchall()
+        super().__init__(psycopg2, "dbname='test' user='postgres' password='123'")
 
 
+begin_time = time.time()
 reader = Reader('O:/progas/python/metadata/tasks.xml')
 sqlite = RAMtoSQLite(reader.xml_to_ram())
 sqlite.generate()
 sqlite.query.kill_connection()
 ram = SQLiteToRAM()
 ram.create_objects()
-generator = Postgres(ram.get_schema())
+generator = RAMtoPostgres(ram.get_schema())
 generator.generate()
+end_time = time.time()
+print(end_time-begin_time)

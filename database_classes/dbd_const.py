@@ -351,7 +351,7 @@ select
   CASE 
     WHEN dbd$constraints.cascading_delete=1 THEN 'True'
     WHEN dbd$constraints.cascading_delete=0 THEN 'False'
-    WHEN dbd$constraints.cascading_delete is null THEN 'None'
+    WHEN dbd$constraints.cascading_delete is null THEN null
   END cascading_delete,
   dbd$constraints.expression "expression"
 --  dbd$constraint_details.position "position",

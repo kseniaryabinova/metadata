@@ -42,7 +42,11 @@ class SQLiteToRAM:
     def select_func(self, query):
         self.query.execute(query)
         result = self.query.fetchall()
-        return [list(elem) for elem in result]
+        result_list = []
+        for elem in [list(elem) for elem in result]:
+            new_list = [x if not x == 'True' else True for x in elem]
+            result_list.append([x if not x == 'False' else False for x in new_list])
+        return result_list
 
     @staticmethod
     def _create_object(obj, args):
