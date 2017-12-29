@@ -18,6 +18,7 @@ class AssemblyAttributesException(Exception):
 
 # сравнение: fc /N tasks.xml filename.xml
 
+
 class Writer:
     def __init__(self, database_schema):
         self.database_schema = database_schema
@@ -126,6 +127,8 @@ class Writer:
 
     @staticmethod
     def get_index_attributes(dict_order, obj):
+        if obj.index_id.name is not None:
+            dict_order['name'] = obj.index_id.name
         dict_order['field'] = obj.field_id
         dict_order['props'] = obj.index_id.kind
 
