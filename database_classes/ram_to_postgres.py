@@ -95,12 +95,23 @@ class RAMtoPostgres:
                 if isinstance(field, Field):
                     columns.append('{} {} '.format(field.name, self.get_domain_name(field.domain_id)))
             pks = []
+            uks = []
+            cks = []
             for const in attr_dict:
                 if isinstance(const, ConstraintDetail):
                     if 'PRIMARY' in const.constraint_id.constraint_type:
                         pks.append(const.field_id)
-            pk = "PRIMARY KEY ({})".format(', '.join(pks))
-            columns.append(pk)
+                    if 'UNIQUE' in const.constraint_id.constraint_type:
+                        uks.append(const.field_id)
+                    if 'CHECK' in const.constraint_id.constraint_type:
+                        check = const.constraint_id.expression.replace('[', '')
+                        check = check.replace(']', '')
+                        cks.append('CHECK {}'.format(check))
+            columns.append("PRIMARY KEY ({})".format(', '.join(pks)))
+            if uks != []:
+                columns.append('UNIQUE ({})'.format(', '.join(uks)))
+            if cks != []:
+                columns += cks
             sql += ', '.join(columns)
             sql += ');'
             tables.append(sql)
@@ -154,6 +165,7 @@ class RAMtoPostgres:
         for domain in self.generate_domains():
             self.query.execute(domain)
         for table in self.generate_tables():
+            print(table)
             self.query.execute(table)
         for fk in self.generate_foreign_keys():
             self.query.execute(fk)

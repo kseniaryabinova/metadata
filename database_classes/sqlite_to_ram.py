@@ -6,15 +6,14 @@ from parser_classes.metadata import Domain
 from parser_classes.metadata import Field
 from parser_classes.metadata import Index
 from parser_classes.metadata import Table
-from database_classes.query import AbstractQuery
+from database_classes.query import SQLiteQuery
 from parser_classes.ram_to_xml import Writer
-import sqlite3
 import pprint
 
 
 class SQLiteToRAM:
     def __init__(self):
-        self.query = Query()
+        self.query = SQLiteQuery()
         self.tree = {}
 
     @staticmethod
@@ -108,11 +107,6 @@ class SQLiteToRAM:
 
     def get_schema(self):
         return self.tree
-
-
-class Query(AbstractQuery):
-    def __init__(self):
-        super().__init__(sqlite3, 'db.sqlite')
 
 
 # ram = SQLiteToRAM()

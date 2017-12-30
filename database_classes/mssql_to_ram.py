@@ -1,7 +1,6 @@
 import pprint
-import pyodbc
 import time
-from database_classes.query import AbstractQuery
+from database_classes.query import MSSQLQuery
 from database_classes.ram_to_postgres import RAMtoPostgres
 from parser_classes.metadata import ConstraintDetail
 from parser_classes.metadata import IndexDetail
@@ -16,7 +15,7 @@ from parser_classes.ram_to_xml import Writer
 
 class MSSQLtoRAM:
     def __init__(self):
-        self.query = Query()
+        self.query = MSSQLQuery()
         self.tree = {}
 
     @staticmethod
@@ -207,26 +206,18 @@ class MSSQLtoRAM:
         return self.tree
 
 
-class Query(AbstractQuery):
-    def __init__(self):
-        super().__init__(pyodbc, r'DRIVER={ODBC Driver 13 for SQL Server};'
-                                 r'SERVER=DESKTOP-3RTKIEI\SQLEXPRESS;'
-                                 r'DATABASE=NORTHWND;'
-                                 r'Trusted_Connection=yes;')
-
-
-ram = MSSQLtoRAM()
-ram.create_db_in_ram()
-ram.query.kill_connection()
-# ram.write_to_concole()
-writer = Writer(ram.get_schema())
-writer.ram_to_xml()
-writer.write_to_file()
-
-begin_time = time.time()
-
-generator = RAMtoPostgres(ram.get_schema())
-generator.generate()
-
-end_time = time.time()
-print(end_time-begin_time)
+# ram = MSSQLtoRAM()
+# ram.create_db_in_ram()
+# ram.query.kill_connection()
+# # ram.write_to_concole()
+# writer = Writer(ram.get_schema())
+# writer.ram_to_xml()
+# writer.write_to_file()
+#
+# begin_time = time.time()
+#
+# generator = RAMtoPostgres(ram.get_schema())
+# generator.generate()
+#
+# end_time = time.time()
+# print(end_time-begin_time)
